@@ -1,0 +1,74 @@
+.. include:: subs.rst
+
+FAQ
+===========
+
+**What is a difference between Pro and Community version?**
+
+  |Product| Pro version is an extension of the Community version and contains additional
+  features, such as: automatic parallel builds and build throttling.
+
+  For a complete set of features for each version, see :doc:`001_features` page.
+
+------
+
+
+**Which Jenkins version is the DepBuilder supporting?**
+
+  |Product| was developed for the current Jenkins LTS (2.263) and should be working
+  up to the latest Jenkins version (2.273).
+
+  It is possible that the |Product| works even on the earlier versions (pre 2.263), but
+  pre 2.263 Jenkins versions are not officially supported.
+
+------
+
+
+**Do I have to rewrite all the existing build jobs to be able to use this plugin?**
+
+  No, your existing build jobs do not have to change. The |Product| is
+  a plugin that simplifies the creation of a large build pipeline that consists
+  of your **existing** build jobs.
+
+------
+
+
+**Why would I use DepBuilder instead of the Jenkins Pipeline?**
+
+  It's easier to use, errors, typos, missing build agents and other problems
+  are caught while you type (or in the case of SCM they are caught before the build runs),
+  so you are free to refactor your build pipeline without the fear of
+  breaking anything late into the build process.
+
+  If you are using the |Product| Pro version, your build automatically runs faster due
+  to the parallel build feature. With Jenkins Pipeline you have to declare the sections
+  that can run in parallel on your own. As your build pipeline grows, figuring out which
+  sections of the pipeline could become parallel becomes unwieldy.
+
+  You also don't have to chose one over the other. |Product| plays nice with other
+  plugins and you can pick both depending on their strengths and weaknesses:
+  |Product| is easier to use while the Jenkins Pipeline is more flexible.
+
+
+------
+
+
+**If my Pro license expires, will my build pipeline stop working?**
+
+  No. If your Pro license has expired your build pipeline will continue working but with the
+  Community set of features. Make sure to check :doc:`001_features` for the difference
+  between Pro and Community version.
+
+
+-------
+
+**Where can I report a bug or suggest a new feature?**
+
+  You can open up a new issue on the |BugReports| page.
+
+
+-------
+
+**Where can I find a documentation for an older version of the plugin?**
+
+    Please check the |DocumentationAll| page.

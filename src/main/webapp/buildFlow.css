@@ -1,0 +1,384 @@
+.hidden {
+    display: none;
+}
+
+/**
+   Utility class, showing the link only on hover. This is usually used
+   for link within the pipeline. Underlined text looks messy when it's
+   displayed in the pipeline.
+*/
+a.hoverLink {
+    text-decoration: none;
+}
+
+a.hoverLink:hover {
+    text-decoration: underline;
+}
+
+.buildFlowGraph {
+    width: 100%;
+}
+
+/* By default the jenkins base styles are setting all nodes with .error class to bold.
+This resets their default settings */
+.buildFlowGraph g.error  {
+    font-weight: 400;
+}
+
+
+/***************************
+ Graph DOM node related styles
+****************************/
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+}
+
+.graphContainer {
+    display: block;
+    /** It would be nicer if we could slide the container in (from height: 0)
+    but in our case we cannot do it. Graph height is only known once it's rendered
+    in the DOM, and using height animation looks very odd for this use case */
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.graphTitleContainer {
+    display: flex;
+    align-items: center;
+}
+
+.graphLight {
+    display: inline-flex;
+    align-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    background-color: #fff;
+    animation: breathe 2s infinite;
+    border-radius: 50% 50%;
+    border: 2px solid #9BA7AF;
+    margin-right: 10px;
+    animation: none;
+}
+
+.graphLight.NONE {
+    background-color: #fff;
+}
+
+.graphLight.IN_PROGRESS {
+    background-color: #59efff;
+    animation: breathe 2s infinite;
+}
+
+.graphLight.SUCCESS {
+    background-color: #59efff;
+}
+
+.graphLight.ABORT {
+    background-color: #ffef00;
+}
+
+.graphLight.ERROR {
+    background-color: #FF6961;
+}
+
+.graphTitleContainer .duration {
+    font-style: italic;
+    font-size: 1.3rem;
+    color: #666;
+}
+
+.actionButtonsContainer {
+    height: 1.8rem;
+    min-height: 1.8rem;
+    margin-left: 1.5rem;
+}
+
+.buttonContainer .iconColor {
+    fill: #fff;
+}
+
+.buttonContainer .icon {
+    /* Magic number as icons seems to be a little to high in comparison
+    to text that is in the button, it looks slightly not centered and this
+    tweak fixes that
+    */
+    margin-top: 1px;
+    margin-right: 5px;
+}
+
+button.hidden {
+    display: none;
+}
+
+/**********************************
+  Styling graph nodes
+***********************************/
+/* Normal graph node style */
+.node rect {
+  fill: #fff;
+  /** if shadow is needed, you can use:
+      filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.2));
+  */
+   stroke: #9BA7AF;
+   stroke-width: 2px;
+}
+
+/** Style graph edge - arrow head and handle */
+.edgePath {
+  fill: #444;
+}
+.edgePath .path {
+  stroke: #444;
+  stroke-width: 1.5px;
+}
+
+/* Style for build node elements in graph */
+.node .label p,
+.node .label a {
+    margin: 0;
+    color: #1b1b1b;
+    font-weight: inherit;
+}
+
+
+.node.NONE rect {
+    /* default color (black text and white background */
+    fill: #fff;
+    stroke-dasharray: 10px;
+}
+
+.node.IN_PROGRESS rect {
+    fill: #59efff;
+    animation: breathe 2s infinite;
+}
+
+.node.SUCCESS rect {
+    fill: #59efff;
+}
+
+.node.ABORT rect {
+    fill: #ffef00;
+}
+
+.node.ERROR rect {
+    fill: #FF6961;
+}
+
+@keyframes breathe {
+    0% {
+        opacity: 1
+    }
+
+    50% {
+        opacity:0.3;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/*
+Ensures that the build link of node is displayed, but the link of the
+node that was not built is not
+*/
+.node a.link {
+    display: inline;
+    visibility: visible;
+}
+
+.node.NONE a.link {
+}
+
+.node-row {
+    min-width: 50px;
+    display: flex;
+    align-items: center;
+}
+
+.node-row .projectNameContainer {
+    display: inline-flex;
+    font-weight: bold;
+}
+
+.node-row .projectName {
+    white-space: nowrap;
+    max-width: 15ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.node-row .projectBuildSpacing {
+    display: inline-flex;
+    flex-grow: 1;
+    margin-right: 3px;
+}
+
+.node-row .duration {
+    /* 15h:20m */
+    min-width: 7ch;
+}
+
+.node-row .buildLink {
+    /* #1234 build number */
+    min-width: 5ch;
+    display: inline-flex !important;
+    justify-content: flex-end;
+}
+
+.iconButton {
+    padding: 0 0 0 5px;
+    margin: 0;
+    border: none;
+    display: inline-block;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+/** button icons style */
+.icon {
+    width: 10px;
+    height: 10px;
+}
+
+/** restart icon is very small in comparison to start and stop icons*/
+.icon.RESTART {
+    width: 12px;
+    height: 12px;
+}
+
+.iconColor {
+    fill: #555;
+}
+
+.iconButton:hover .iconColor {
+    fill: #222;
+}
+
+
+/*****************************
+ Styling used on /config page
+******************************/
+/* Code mirror textarea has very cramped text by default */
+.CodeMirror-scroll {
+    line-height: 1.2rem;
+}
+
+/**
+By default the gutter with line numbers is covering the floating
+save|cancel buttons. Changing z-index from 10 to 9 fixes this problem.
+*/
+.CodeMirror-gutter {
+    z-index: 9 !important;
+}
+
+.errorNode > rect {
+  /* background color */
+  fill: #e60b0b;
+  /* border color */
+  stroke: #000;
+}
+
+.errorNode text {
+    fill: white;
+}
+
+.errorNode .label a {
+    color: white;
+}
+
+
+/*
+ * Scm section looks really ugly with weird dark gray borders on the left
+ * displaying the entire SCM section block. By default the jenkins sections
+ * are marked with that border.
+ */
+ #scmSection tr {
+    background: transparent !important;
+    border-left: none !important;
+ }
+
+ #scmSection td .repeated-container,
+ #scmSection td .hetero-list-container {
+    border-left: none !important;
+ }
+
+ /** First table row in scm is empty row. Empty row looks very weird in the UI
+  * that's why we are removing it here.
+  */
+ #scmSection > tbody > tr:first-child {
+    display: none;
+ }
+
+
+/*****************************
+  Modal styles
+******************************/
+.modalBackground {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+}
+
+.modalCard {
+    margin: 0 20px;
+    overflow: auto;
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    min-width: 500px;
+    max-width: 100%;
+    max-height: calc(100vh - 1rem);
+
+    flex-direction: column;
+    overflow: hidden;
+    -ms-overflow-y: visible;
+    background-color: #fff;
+    padding: 20px 10px 15px 10px;
+    border-radius: 3px;
+    z-index: 1001;
+}
+
+.modalCard.visible,
+.modalBackground.visible {
+    display: block;
+}
+
+.modalCard .title {
+    text-align: center;
+}
+
+.modalCard .textArea {
+    width: 45rem;
+    min-height: 12rem;
+    height: 16rem;
+    padding: 0.3rem;
+    font-family: 'monospace';
+}
+
+.modalCard .buttonContainer {
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    margin-top: 1rem;
+    /* For some reason when hovering the button the dialogs bottom edge
+    flickers for 1px down. Adding this bottom gets rid of the annoying
+    flicker.
+    */
+    padding-bottom: 1px;
+}
+
+/* makes the element unscrollable (apply it to html element when the
+ modal is being opened) */
+.is-clipped {
+    overflow: hidden !important;
+}

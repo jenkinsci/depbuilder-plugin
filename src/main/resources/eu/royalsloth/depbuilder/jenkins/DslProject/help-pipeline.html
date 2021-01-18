@@ -1,0 +1,34 @@
+<div>
+    <p>
+    Pipeline script that defines how the jobs will be built, see the example below.
+    To learn more about the possible options, check out the
+    <a href="https://docs.royalsloth.eu/depbuilder/">DepBuilder documentation</a>.
+    </p>
+
+    <p><b>Script Example:</b></p>
+<code><pre>    _BUILD {
+        maxDuration: 2:30
+        buildThrottle: [08:00|10, 14:15|5, 20:00|-1]
+    }
+
+    _ALL {
+        maxDuration: 0:10
+        onParentFailure: ABORT
+    }
+
+    lib {
+        agent: [linux_runner_1, linux_runner_2]
+        maxDuration: 0:30
+    }
+
+    backend, frontend {
+        onParentFailure: BUILD
+        weight: 3
+    }
+
+    // define the build pipeline
+    lib -> backend -> frontend
+    backend -> deploy; frontend -> deploy
+</pre>
+</code>
+</div>

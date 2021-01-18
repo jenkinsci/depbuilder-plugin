@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "module": "commonjs",
+    "target": "ES5",
+    "outDir": "src/main/webapp/js/",
+    "rootDirs": ["src/main/webapp/", "src/main/webapp/vendor/"],
+    "lib": ["dom", "ES5", "ES2015.Collection"]
+  },
+  "exclude": ["target", "work"]
+}

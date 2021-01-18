@@ -1,0 +1,59 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<!-- This is the project page that configure-entries page redirects you to after clicking save
+Main page with project name/permalinks, etc...
+
+Original page could be found here:
+https://github.com/jenkinsci/jenkins/blob/337b44428f49a76100f7c915c6366e585e13966f/core/src/main/resources/hudson/model/Job/index.jelly
+-->
+
+    <l:layout title="${it.displayName}${not empty it.parent.fullDisplayName?' ['+it.parent.fullDisplayName+']':''}">
+        <link rel="stylesheet" href="${rootURL}/plugin/depbuilder/buildFlow.css" />
+
+        <st:include page="sidepanel.jelly" />
+        <l:main-panel>
+            <h1 class="job-index-headline page-headline">${it.pronoun} <l:breakable value="${it.displayName}"/></h1>
+            <j:if test="${(it.fullName!=it.fullDisplayName) and (it.class.name!='hudson.matrix.MatrixConfiguration')}"> <!-- TODO rather check for TopLevelItem (how to do this from Jelly?) -->
+                <j:choose>
+                    <j:when test="${it.parent!=app}">
+                        ${%Full project name}: ${it.fullName}
+                    </j:when>
+                    <j:otherwise>
+                        ${%Project name}: ${it.fullName}
+                    </j:otherwise>
+                </j:choose>
+            </j:if>
+            <t:editableDescription permission="${it.CONFIGURE}"/>
+
+            <st:include page="jobpropertysummaries.jelly"/>
+            <st:include page="main.jelly"/>
+            <st:include page="permalinks.jelly"/>
+            <br/>
+
+            <!-- graphs will appear here -->
+            <div id="svgContainer">
+            </div>
+
+            <div class="modalCard" id="pipelineModal">
+                <h3 class="title">Pipeline <span id="buildNumber"></span></h3>
+                <textarea id="pipelineModalTextArea" class="textArea" readonly="true">
+                </textarea>
+                <br/>
+                <div class="buttonContainer">
+                    <span class="yui-button primary">
+                        <button id="confirmButton" class="center">Close</button>
+                    </span>
+                </div>
+            </div>
+            <div id="modalBackground" class="modalBackground"></div>
+
+            <!-- scripts should be within the main panel, otherwise they are pushed
+            to all parts of the layout (like sidebar or navbar) and the same script
+            then executes a lot of times as there are index layout parts -->
+            <!-- plugin name should be artifact id that is specified in pom -->
+            <script src="${rootURL}/plugin/depbuilder/vendor/d3.v5.min.js"></script>
+            <script src="${rootURL}/plugin/depbuilder/vendor/dagre-d3.min.js"></script>
+            <script src="${rootURL}/plugin/depbuilder/js/displayBuildGraphs.js"></script>
+        </l:main-panel>
+    </l:layout>
+</j:jelly>

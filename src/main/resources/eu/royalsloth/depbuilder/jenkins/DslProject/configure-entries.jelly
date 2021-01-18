@@ -1,0 +1,201 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:st="jelly:stapler" xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:p="/lib/hudson/project">
+    <!-- For more info on jenkins UI components see:
+    https://reports.jenkins.io/core-taglib/jelly-taglib-ref.html
+    -->
+    <link rel="stylesheet" href="${rootURL}/plugin/depbuilder/buildFlow.css"/>
+
+    <!-- Default freestyle build options, that should be displayed at the top of the page,
+    otherwise they are put together into one of our sections and that looks weird -->
+    <p:config-disableBuild/>
+    <p:config-concurrentBuild/>
+
+    <f:section title="DepBuilder">
+        <!-- this is actually a bug in the textarea code-mirror part, so we have an ugly workaround
+        https://issues.jenkins-ci.org/browse/JENKINS-15604
+        Once it is resolved, make sure to change on blur method in the codemirror-config
+        -->
+        <script>
+            // code mirror text area change is triggering on focus lost (blur), commit text area
+            // and render graph
+            function cmChange(editor, change) {
+                editor.save();
+                try {
+                    $$('.validated').forEach(function (e) {e.onchange()})
+                } catch (e) {
+                    console.log("Problem with validating error area: " + e.message);
+                }
+
+                try {
+                    // this is a custom method on html textarea node that is added in another file
+                    editor.getTextArea().onDslChange();
+                } catch (e) {
+                    console.log("Failed to execute graph dsl change action: " + e);
+                }
+            }
+
+        </script>
+
+        <!-- The reason why we are building our own input box and toggling the right
+        elements is because the internal jenkins ones are kind of buggy. They toggle
+        visibility just fine, but when you change from pipeline to SCM and back the
+        pipeline is stored as null (unless you change one character then it works fine)
+        -->
+        <f:entry title="Definition" field="scriptInputType">
+            <f:select id="scriptInputTypeSelector" class="setting-input dropdownList"/>
+        </f:entry>
+
+        <!-- This is awful workaround but we support both Jenkins LTS (v2.235) as well as
+        later versions (2.264). We are trying to render sections of the UI based on the
+        current value of the input scriptInputType selector. Jenkins after v2.264 has
+        changed the UI rendering from tables to divs, and the only way to assign ids
+        to the sections in the UI is to create either table or div element
+        (depending on which version of the Jenkins we are using). This dynamic switching
+        is implemented is done in javascript
+
+        Maybe there is a better way of doing that, but right now we are simply switching
+        that manually.
+
+        WARNING: If you change anything in this section, make sure to change it
+        in the else block as well
+        -->
+        <j:if test="${it.tableBasedRendering}">
+            <f:block>
+                <table id="pipelineSection">
+                    <f:entry title="Pipeline" field="pipeline">
+                        <!-- some modes don't work, e.g: javascript mode works but java does not -->
+                        <!-- for more info, see: https://codemirror.net/doc/manual.html -->
+                        <f:textarea style="min-height: 300px"
+                                    id="pipelineArea"
+                                    codemirror-mode="javascript"
+                                    codemirror-config="lineNumbers:true, css:'line-height: 1.2rem', 'tabSize': 4, 'indentUnit': 4, 'onBlur': cmChange"
+                        />
+                    </f:entry>
+
+                    <!-- Graph height is changing depending on the DSL, if graph is displayed
+                    above the dsl input area, whenever the DSL changes the height of the graph might
+                    also change which causes a janky movement of text area (either up if graph height
+                    has decreased or down if graph height increased). Having graph below the text area
+                    fixes this problem. -->
+                    <f:entry title="Graph">
+                        <div id="visualization">
+                            <svg id="svg-canvas" class="buildFlowGraph"></svg>
+                        </div>
+                    </f:entry>
+                </table>
+            </f:block>
+
+            <f:block>
+                <table id="scmSection">
+                    <f:entry>
+                        <!-- taken from <p:config-scm>. We cannot use f:dropdownList &6 f:dropdownListBlock
+                        because the AbstractProject parser is expecting SCM to always come via radio buttons
+                        and we would have to modify that SCM parsing somehow.
+                         -->
+                        <f:descriptorRadioList name="scm">
+                            <j:forEach var="descriptor" items="${h.getSCMDescriptors(instance)}" varStatus="loop">
+                                <j:set var="scmd" value="${descriptor}"/>
+                                <!-- backward compatibility with <1.238 -->
+                                <f:radioBlock name="scm" help="${descriptor.helpFile}"
+                                              value="${loop.index}" title="${descriptor.displayName}"
+                                              checked="${instance.scm.descriptor == descriptor}">
+                                    <j:set var="instance"
+                                           value="${instance.scm.descriptor == descriptor ? it.scm : null}"/>
+                                    <j:set var="scm" value="${instance}"/>
+                                    <!-- backward compatibility with <1.238 -->
+                                    <f:class-entry descriptor="${descriptor}"/>
+                                    <st:include from="${descriptor}" page="${descriptor.configPage}"
+                                                optional="true"/>
+                                </f:radioBlock>
+                            </j:forEach>
+                        </f:descriptorRadioList>
+                    </f:entry>
+
+                    <!-- Location of the script file -->
+                    <tr style="height:1.5rem"></tr>
+                    <f:entry title="Pipeline File Location" field="scmFileLocation">
+                        <f:textbox value="${it.scmFileLocation}"/>
+                    </f:entry>
+                </table>
+            </f:block>
+        </j:if>
+
+        <!-- if we are not using table based rendering, we have to switch those table
+        sections from the previous if block to divs, otherwise the UI will not work
+        correctly (see explanation above).
+        -->
+        <j:if test="${!it.tableBasedRendering}">
+            <f:block>
+                <div id="pipelineSection">
+                    <f:entry title="Pipeline" field="pipeline">
+                        <f:textarea style="min-height: 300px"
+                                    id="pipelineArea"
+                                    codemirror-mode="javascript"
+                                    codemirror-config="lineNumbers:true, css:'line-height: 1.2rem', 'tabSize': 4, 'indentUnit': 4, 'onBlur': cmChange"
+                        />
+                    </f:entry>
+
+                    <f:entry title="Graph">
+                        <div id="visualization">
+                            <svg id="svg-canvas" class="buildFlowGraph"></svg>
+                        </div>
+                    </f:entry>
+                </div>
+            </f:block>
+
+            <f:block>
+                <div id="scmSection">
+                    <f:entry>
+                        <f:descriptorRadioList name="scm">
+                            <j:forEach var="descriptor" items="${h.getSCMDescriptors(instance)}" varStatus="loop">
+                                <j:set var="scmd" value="${descriptor}"/>
+                                <f:radioBlock name="scm" help="${descriptor.helpFile}"
+                                              value="${loop.index}" title="${descriptor.displayName}"
+                                              checked="${instance.scm.descriptor == descriptor}">
+                                    <j:set var="instance"
+                                           value="${instance.scm.descriptor == descriptor ? it.scm : null}"/>
+                                    <j:set var="scm" value="${instance}"/>
+                                    <f:class-entry descriptor="${descriptor}"/>
+                                    <st:include from="${descriptor}" page="${descriptor.configPage}"
+                                                optional="true"/>
+                                </f:radioBlock>
+                            </j:forEach>
+                        </f:descriptorRadioList>
+                    </f:entry>
+
+                    <div style="height:1.5rem"></div>
+                    <f:entry title="Pipeline File Location" field="scmFileLocation">
+                        <f:textbox value="${it.scmFileLocation}"/>
+                    </f:entry>
+                </div>
+            </f:block>
+        </j:if>
+
+
+        <f:entry title="Displayed graphs" field="numberOfGraphs">
+            <f:number/>
+        </f:entry>
+    </f:section>
+
+    <f:section title="DepBuilder Helpers">
+        <f:entry title="Projects" field="projects">
+            <f:combobox/>
+        </f:entry>
+
+        <f:entry title="Build Agents" field="agents">
+            <f:combobox/>
+        </f:entry>
+    </f:section>
+
+
+    <!-- Default sections as they are used in the freestyle project -->
+    <p:config-trigger/>
+    <p:config-builders/>
+    <p:config-buildWrappers/>
+    <p:config-publishers2/>
+
+    <!-- plugin name should be artifact id that is specified in pom -->
+    <script src="${rootURL}/plugin/depbuilder/vendor/d3.v5.min.js"></script>
+    <script src="${rootURL}/plugin/depbuilder/vendor/dagre-d3.min.js"></script>
+    <script src="${rootURL}/plugin/depbuilder/js/visualization.js"></script>
+</j:jelly>

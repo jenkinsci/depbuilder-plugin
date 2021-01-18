@@ -1,0 +1,6 @@
+<?jelly escape-by-default='true'?>
+<!-- This message is rendered on the displayed plugin page -->
+<div>
+    Build project dependencies in a specific order by combining existing
+    Freestyle jobs and Pipelines together into a large build workflow.
+</div>
