@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="docs/_static/logo_dark_min.png" height="64">
+    <img src="docs/_static/logo_dark_min.png" height="64" alt="DepBuilder logo">
 </p>
 
 
@@ -15,41 +15,59 @@ through build visualization.
 **Example:**
 
 Imagine having 4 jobs (A, B, C, D) that you would like to build in a certain 
-order. The build itself shouldn't take more than 30 minutes and the job C
+order. The build itself shouldn't take more than 20 minutes and the job A
 should be built on a Windows machine called "windows_runner".
 
 <p align="center">
     <img src="docs/docs/images/initialBuildDefinition_min.png" alt="Desired build pipeline definition" />
 </p>
 
-These requirements could be easily fulfilled through the use of DepBuilder DSL: 
+With the DepBuilder plugin the process of defining such pipeline would be:
 
-```cpp
+1. Create a new project
+2. Define the pipeline dependencies
+3. Run the build 
 
-_BUILD {
-    maxDuration: 00:30
-}
 
-C {
-    agent: [windows_runner]
-}
+### 1. Create a new project
 
-A -> B
-B -> C
-C -> D
-```
-
-After building the DepBuilder pipeline, you should be able to see a 
-build graph on the pipeline's dashboard:
+Create a new Jenkins project, pick your pipeline name and select the DepBuilder project
 
 <p align="center">
-    <img src="docs/docs/images/buildSuccess_min.png" alt="Graph of the projects that are part of the successfully built pipeline"/>
+    <img src="docs/docs/images/ui/newProject_min.png" alt="Create a new DepBuilder project through Jenkins New Item option">
+</p>
+
+
+### 2. Define the build dependencies
+
+Create the build pipeline out of existing Jenkins jobs via a strict domain specific
+language that is checking for typos, missing build agents and other problems as you
+type.
+
+<p align="center">
+    <img src="docs/docs/images/intro/pipelineDefinition_min.png" alt="Definition of the DepBuilder Pipeline script"/>
+</p>
+
+
+### 3. Run the build
+
+Run the build and watch the progress or review past builds. The colors of the nodes in
+the graph represent the build status:
+
+* **Blue**: success
+* **Red**: error
+* **Yellow**: aborted
+* **White**: not built
+* **Fading blue**: in progress
+
+<p align="center">
+    <img src="docs/docs/images/intro/buildHistory_min.png" alt="DepBuilder pipeline build visualization"/>
 </p>
 
 
 ## Documentation
 
-Documentation is located [here](https://docs.royalsloth.eu/depbuilder/latest/docs/000_intro.html).
+DepBuilder Documentation is located [here](https://docs.royalsloth.eu/depbuilder/latest/docs/000_intro.html).
 
 
 ## Installation 

@@ -19,8 +19,8 @@ glancable through the live build visualization.
 
 **Example:**
 Say we have 4 jobs (A, B, C, D) which we would like to build in a specific order.
-The build itself shouldn't take more than 10 minutes and the job A should be built on the
-Windows machine.
+The build itself shouldn't take more than 20 minutes and the job A should be built on the
+Windows machine called "windows_runner".
 
 .. image:: images/initialBuildDefinition_min.png
    :align: center
@@ -28,30 +28,53 @@ Windows machine.
          should be built before D.
 
 
-With a |Product| we would define such a build pipeline with the following script:
+With the |Product| plugin the process of defining such pipeline would be:
 
-.. code-block:: cpp
-
-    _BUILD {
-        maxDuration: 00:10
-    }
-
-    A {
-        agent: [windows_runner]
-    }
-
-    // define the build order
-    A -> C
-    B -> C
-    C -> D
+#. Create a new project
+#. Define the pipeline dependencies
+#. Run the build
 
 
-After running the build, you should be able to see the following result:
+**1. Create a new project**
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: images/buildSuccess_min.png
+Create a new Jenkins project, pick your pipeline name and select the DepBuilder project.
+
+.. image:: images/ui/newProject_min.png
    :align: center
-   :alt: Build graph of the successful build
+   :alt: Create a new DepBuilder project
 
+|
+
+**2. Define the pipeline dependencies**
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Create the build pipeline out of existing Jenkins jobs via a strict domain specific
+language that is checking for typos, missing build agents, dependency cycles and
+other problems as you type.
+
+.. image:: images/intro/pipelineDefinition_min.png
+   :align: center
+   :alt: Definition of the DepBuilder build pipeline in the Jenkins user interface
+
+|
+
+3. Run the build
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Run the build and watch the pipeline progress. The nodes' colors represent the
+build status of the specific project in the pipeline:
+
+* **Blue**: success
+* **Red**: error
+* **Yellow**: aborted
+* **White**: not built
+* **Fading blue**: in progress
+
+.. image:: images/intro/buildHistory_min.png
+   :align: center
+   :alt: History of the DepBuilder pipeline builds
+
+|
 
 The build graph is packed with information:
 
