@@ -96,7 +96,13 @@ html_context = {
     'css_files': [
         '_static/theme_overrides.css',  # override wide tables in RTD theme
         ],
-     }
+
+    "display_github": True,
+    "github_user": "RoyalSloth",
+    "github_repo": "DepBuilder",
+    "github_version": "master",
+    "conf_py_path": "/docs/",
+}
 
 html_show_sourcelink = False
 html_logo = "_static/docs_logo.png"

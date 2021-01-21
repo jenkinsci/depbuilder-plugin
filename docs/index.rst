@@ -68,10 +68,8 @@ See |ProductPage|
    docs/002_ui-overview.rst
    docs/004_installation.rst
    docs/005_faq.rst
-   docs/007_changelog.rst
    docs/006_support.rst
-
-..  docs/007_changelog.rst
+   docs/007_changelog.rst
 
 
 
