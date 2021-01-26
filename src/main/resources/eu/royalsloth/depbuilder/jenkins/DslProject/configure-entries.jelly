@@ -67,6 +67,7 @@
                         <!-- for more info, see: https://codemirror.net/doc/manual.html -->
                         <f:textarea style="min-height: 300px"
                                     id="pipelineArea"
+                                    checkMethod="post"
                                     codemirror-mode="javascript"
                                     codemirror-config="lineNumbers:true, css:'line-height: 1.2rem', 'tabSize': 4, 'indentUnit': 4, 'onBlur': cmChange"
                         />
@@ -114,7 +115,7 @@
                     <!-- Location of the script file -->
                     <tr style="height:1.5rem"></tr>
                     <f:entry title="Pipeline File Location" field="scmFileLocation">
-                        <f:textbox value="${it.scmFileLocation}"/>
+                        <f:textbox value="${it.scmFileLocation}" checkMethod="post" />
                     </f:entry>
                 </table>
             </f:block>
@@ -130,6 +131,7 @@
                     <f:entry title="Pipeline" field="pipeline">
                         <f:textarea style="min-height: 300px"
                                     id="pipelineArea"
+                                    checkMethod="post"
                                     codemirror-mode="javascript"
                                     codemirror-config="lineNumbers:true, css:'line-height: 1.2rem', 'tabSize': 4, 'indentUnit': 4, 'onBlur': cmChange"
                         />
@@ -165,7 +167,7 @@
 
                     <div style="height:1.5rem"></div>
                     <f:entry title="Pipeline File Location" field="scmFileLocation">
-                        <f:textbox value="${it.scmFileLocation}"/>
+                        <f:textbox value="${it.scmFileLocation}" checkMethod="post"/>
                     </f:entry>
                 </div>
             </f:block>

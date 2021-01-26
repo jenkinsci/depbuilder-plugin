@@ -25,7 +25,7 @@ public class JenkinsUtil {
      *
      * @return jenkins build agents without master node
      */
-    public static List<Node> getSlaveNodes() {
+    public static List<Node> getBuildAgents() {
         Jenkins jenkins = getJenkins();
         return jenkins.getNodes();
     }
@@ -37,9 +37,9 @@ public class JenkinsUtil {
      */
     public static List<Node> getAllAgents() {
         Jenkins jenkins = getJenkins();
-        List<Node> nodes = getSlaveNodes();
-        // jenkins represents a master node, if there are no slave nodes
-        // we can only build on master node
+        List<Node> nodes = getBuildAgents();
+        // jenkins represents a master node, if there are no other
+        // agents we can only build on master node
         nodes.add(jenkins);
         return nodes;
     }

@@ -18,6 +18,7 @@ import org.jenkins.ui.icon.IconSet;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.*;
 import org.kohsuke.stapler.export.Exported;
+import org.kohsuke.stapler.verb.POST;
 
 import javax.annotation.CheckForNull;
 import javax.servlet.ServletException;
@@ -99,7 +100,7 @@ public class DslProject extends Project<DslProject, DslBuild> implements TopLeve
 
     /**
      * Jenkins has changed the UI from table based rendering to div based rendering. The old jenkins versions
-     * (like current LTS 2.235) are using tables, and if we want to dynamically render sections of the dom
+     * (like current LTS 2.263) are using tables, and if we want to dynamically render sections of the dom
      * tree, we can not do that without introducing a table with a specific id.
      * <p>
      * In the newer Jenkins versions, tables were replaced with divs and to render sections dynamically we
@@ -141,9 +142,12 @@ public class DslProject extends Project<DslProject, DslBuild> implements TopLeve
 
     // SCM related info will be parsed through the received json within the super.doConfigSubmit() code.
     // For some reason I cannot get it to work via our custom doCheck method in the project descriptor.
+    @POST
     @Override
     public synchronized void doConfigSubmit(StaplerRequest req,
             StaplerResponse rsp) throws IOException, ServletException, Descriptor.FormException {
+        JenkinsUtil.getJenkins().checkPermission(Jenkins.ADMINISTER);
+
         JSONObject json = req.getSubmittedForm();
         int graphs = json.optInt("numberOfGraphs", 5);
         this.numberOfGraphs = graphs;
@@ -342,6 +346,7 @@ public class DslProject extends Project<DslProject, DslBuild> implements TopLeve
         }
 
         public static final String iconUri = "plugin/depbuilder/icons/depbuilder.png";
+
         static {
             IconSet.icons.addIcon(
                     new Icon("icon-depbuilder icon-sm", iconUri, Icon.ICON_SMALL_STYLE));
@@ -379,8 +384,10 @@ public class DslProject extends Project<DslProject, DslBuild> implements TopLeve
         // it's not triggered on save action (we call it manually via onFormSubmit action)
         // Apparently there is an open bug for exactly this behaviour and provided
         // workaround seem to work for now: https://issues.jenkins-ci.org/browse/JENKINS-15604
+        @POST
         public FormValidation doCheckPipeline(@QueryParameter String value,
                 @AncestorInPath DslProject project) {
+            project.checkPermission(Item.CONFIGURE);
             if (value == null) {
                 return FormValidation.error("Pipeline should not be empty");
             }
@@ -400,8 +407,10 @@ public class DslProject extends Project<DslProject, DslBuild> implements TopLeve
             }
         }
 
+        @POST
         public FormValidation doCheckScmFileLocation(@QueryParameter String value,
                 @AncestorInPath DslProject project) {
+            project.checkPermission(Item.CONFIGURE);
             if (value == null || value.isEmpty()) {
                 return FormValidation.error("File location should not be empty");
             }

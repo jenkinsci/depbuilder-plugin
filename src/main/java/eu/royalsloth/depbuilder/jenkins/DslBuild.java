@@ -413,7 +413,7 @@ public class DslBuild extends Build<DslProject, DslBuild> {
         BuildLayers layers = BuildLayers.topologicalSort(buildJobs);
         if (layers.hasCycle()) {
             throw new BuildCycleException(
-                    "Provided graph has a cycle: " + String.join(" 🠖 ", layers.getBuildCycle()));
+                    "Provided graph has a cycle: " + String.join(" ➞ ", layers.getBuildCycle()));
         }
 
         return build;
