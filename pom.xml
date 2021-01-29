@@ -7,29 +7,6 @@
         <version>4.4</version>
         <relativePath />
     </parent>
-    <groupId>io.jenkins.plugins</groupId>
-    <!-- WORKAROUND: artifact id is showing as shortName in the hpi plugin.
-    The shortName is shown in the UI when you install the plugin (manual installation),
-    so it has to look the same as the plugin name. I don't know why Jenkins
-    is not just using the name tag instead. This goes Jenkins style rules
-    for having artifactId in lowercase, so we are sticking to lowercase for now.
-    -->
-    <artifactId>depbuilder</artifactId>
-    <version>1.0.0</version>
-    <packaging>hpi</packaging>
-
-    <name>DepBuilder</name>
-    <description>Build project dependencies in a specific order by combining
-        existing Freestyle jobs and Pipelines together into the unified build workflow.
-    </description>
-    <url>https://www.royalsloth.eu/products/depbuilder/</url>
-
-    <licenses>
-        <license>
-            <name>GNU Affero General Public License</name>
-            <url>https://www.gnu.org/licenses/agpl-3.0.en.html</url>
-        </license>
-    </licenses>
 
     <properties>
         <revision>1.0.0</revision>
@@ -39,13 +16,38 @@
         <java.level>8</java.level>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
     </properties>
 
+    <groupId>io.jenkins.plugins</groupId>
+    <!-- WORKAROUND: artifact id is showing as shortName in the hpi plugin.
+    The shortName is shown in the UI when you install the plugin (manual installation),
+    so it has to look the same as the plugin name. I don't know why Jenkins
+    is not just using the name tag instead. This goes Jenkins style rules
+    for having artifactId in lowercase, so we are sticking to lowercase for now.
+    -->
+    <artifactId>depbuilder</artifactId>
+    <version>${revision}${changelist}</version>
+    <packaging>hpi</packaging>
+
+    <name>DepBuilder</name>
+    <description>Build project dependencies in a specific order by combining
+        existing Freestyle jobs and Pipelines together into the unified build workflow.
+    </description>
+    <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+
+    <licenses>
+        <license>
+            <name>GNU Affero General Public License</name>
+            <url>https://www.gnu.org/licenses/agpl-3.0.en.html</url>
+        </license>
+    </licenses>
+
     <scm>
-        <connection>scm:git:ssh://git@github.com:jenkinsci/depbuilder-plugin.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:jenkinsci/depbuilder-plugin.git</developerConnection>
-        <url>https://github.com/jenkinsci/depbuilder-plugin</url>
-        <tag>HEAD</tag>
+        <connection>scm:git:git://github.com/${gitHubRepo}.git</connection>
+        <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
+        <url>https://github.com/${gitHubRepo}</url>
+        <tag>${scmTag}</tag>
     </scm>
 
     <build>
