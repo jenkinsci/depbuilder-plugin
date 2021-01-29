@@ -1,10 +1,13 @@
 package eu.royalsloth.depbuilder.jenkins.api;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.util.Set;
 
 /**
  * DTO for transfering build related data to frontend
  */
+@SuppressFBWarnings(value="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification = "this is public api used by the frontend")
 public class FinishedBuildJob {
     // project related properties
     public String projectName;

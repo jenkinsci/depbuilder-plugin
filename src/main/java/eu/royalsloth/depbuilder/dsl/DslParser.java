@@ -600,7 +600,7 @@ public class DslParser {
         Token possibleColon = tokenizer.peekNextToken();
         if (possibleColon.type == TokenType.COLON) {
             // if that is the case, the user has already provided a seconds part of the duration
-            Token colon = tokenizer.getNextToken();
+            tokenizer.getNextToken(); // get the colon part
             Token secondsPart = tokenizer.getNextToken();
             if (!secondsPart.isNumber()) {
                 throw ParseException.create(tokenizer, secondsPart, String.format("invalid %s value expected hh:mm:ss, got '%s:%s:%s'", identifier, hoursPart.text, minutesPart.text, secondsPart.text));

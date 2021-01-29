@@ -56,7 +56,6 @@ public class AssignToNode extends InvisibleAction implements LabelAssignmentActi
 
     public static AssignToNode createAction(List<BuildAgent> allPossibleBuildAgents) {
         // TODO: move jenkins calls outside of this action?
-        final Jenkins jenkins = JenkinsUtil.getJenkins();
         final List<Node> buildNodes = JenkinsUtil.getAllAgents();
 
         if (allPossibleBuildAgents.isEmpty()) {

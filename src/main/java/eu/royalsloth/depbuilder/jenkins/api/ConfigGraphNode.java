@@ -1,6 +1,7 @@
 package eu.royalsloth.depbuilder.jenkins.api;
 
 import eu.royalsloth.depbuilder.dsl.ParsedBuildJob;
+import org.graalvm.compiler.core.common.SuppressFBWarnings;
 
 import java.util.Set;
 
@@ -8,6 +9,7 @@ import java.util.Set;
  * Helper class used for serializing build jobs in order to display them on the graph in the Jenkins UI job
  * configuration page.
  */
+@SuppressFBWarnings(value="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification = "this is public api used by the frontend")
 public class ConfigGraphNode {
     public final String projectName;
     public final Set<String> children;

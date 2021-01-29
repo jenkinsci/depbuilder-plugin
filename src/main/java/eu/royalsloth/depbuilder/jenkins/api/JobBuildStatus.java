@@ -3,11 +3,13 @@ package eu.royalsloth.depbuilder.jenkins.api;
 import eu.royalsloth.depbuilder.jenkins.DslBuild;
 import eu.royalsloth.depbuilder.jenkins.JenkinsUtil;
 import hudson.model.Run;
+import org.graalvm.compiler.core.common.SuppressFBWarnings;
 
 
 /**
  * DTO for holding a job build information for one build of the DslBuild
  */
+@SuppressFBWarnings(value="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification = "this is public api used by the frontend")
 public class JobBuildStatus {
     public String projectName = "";
     public String buildStatus = "";
@@ -38,11 +40,6 @@ public class JobBuildStatus {
         if (build == null) {
             // this should never happen
             return "MISSING_BUILD";
-        }
-
-        if (build.getParent() == null) {
-            // this should never happen
-            return "MISSING_PARENT";
         }
 
         String parentName = build.getParent().getName();

@@ -685,7 +685,10 @@ public class DslBuild extends Build<DslProject, DslBuild> {
                     r = FAILURE;
                 }
             } catch (InterruptedException e) {
-                r = Executor.currentExecutor().abortResult();
+                final Executor executor = Executor.currentExecutor();
+                if (executor != null) {
+                    r = executor.abortResult();
+                }
                 // not calling Executor.recordCauseOfInterruption here. We do that where this exception is consumed.
                 throw e;
             } finally {
