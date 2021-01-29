@@ -41,6 +41,13 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
+    <scm>
+        <connection>scm:git:ssh://git@github.com:jenkinsci/depbuilder-plugin.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:jenkinsci/depbuilder-plugin.git</developerConnection>
+        <url>https://github.com/jenkinsci/depbuilder-plugin</url>
+        <tag>HEAD</tag>
+    </scm>
+
     <build>
         <finalName>${name}-${revision}</finalName>
 
