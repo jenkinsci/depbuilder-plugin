@@ -1,9 +1,9 @@
 package eu.royalsloth.depbuilder.jenkins.api;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import eu.royalsloth.depbuilder.jenkins.DslBuild;
 import eu.royalsloth.depbuilder.jenkins.JenkinsUtil;
 import hudson.model.Run;
-import org.graalvm.compiler.core.common.SuppressFBWarnings;
 
 
 /**

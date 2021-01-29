@@ -1,7 +1,7 @@
 package eu.royalsloth.depbuilder.jenkins.api;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import eu.royalsloth.depbuilder.dsl.ParsedBuildJob;
-import org.graalvm.compiler.core.common.SuppressFBWarnings;
 
 import java.util.Set;
 

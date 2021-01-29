@@ -9,8 +9,6 @@
     </parent>
 
     <properties>
-        <revision>1.0.0</revision>
-        <changelist>-SNAPSHOT</changelist>
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
         <jenkins.version>2.235.1</jenkins.version>
         <java.level>8</java.level>
@@ -51,7 +49,7 @@
     </scm>
 
     <build>
-        <finalName>${name}-${revision}</finalName>
+        <finalName>${name}-${version}</finalName>
 
         <plugins>
             <plugin>
