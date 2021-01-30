@@ -65,6 +65,13 @@
         </plugins>
     </build>
 
+    <developers>
+        <developer>
+            <id>RoyalSloth</id>
+            <name>RoyalSloth</name>
+        </developer>
+    </developers>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

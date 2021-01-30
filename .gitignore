@@ -3,6 +3,6 @@
 .vscode
 target
 work
-src/main/webapp/js
+src/main/webapp/js/*.map
 
 docs/_build
