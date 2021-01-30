@@ -15,11 +15,11 @@ FAQ
 
 **Which Jenkins version is the DepBuilder supporting?**
 
-  |Product| was developed for the current Jenkins LTS (2.263) and should be working
-  up to the latest Jenkins version (2.273).
+  |Product| was developed for the Jenkins |MinSupportedJenkinsVersion| and should be working
+  up to the latest Jenkins version (|LatestJenkinsVersion|).
 
-  It is possible that the |Product| works even on the earlier versions (pre 2.263), but
-  pre 2.263 Jenkins versions are not officially supported.
+  It is possible that the |Product| works even on the earlier versions (pre |MinSupportedJenkinsVersion|),
+  but they are not officially supported.
 
 ------
 
@@ -56,7 +56,7 @@ FAQ
 **If my Pro license expires, will my build pipeline stop working?**
 
   No. If your Pro license has expired your build pipeline will continue working but with the
-  Community set of features. Make sure to check :doc:`001_features` for the difference
+  |Product| Community set of features. Make sure to check :doc:`001_features` for the difference
   between Pro and Community version.
 
 

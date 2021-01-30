@@ -3,11 +3,11 @@
 Installation
 ===============
 
-|Product| was developed for the current Jenkins LTS (2.263) and should be working
-up to the latest Jenkins version (2.273).
+|Product| was developed for the Jenkins |MinSupportedJenkinsVersion| and should be working
+up to the latest Jenkins version (|LatestJenkinsVersion|).
 
-It is possible that the |Product| works even on the earlier versions (pre 2.263), but
-pre 2.263 Jenkins versions are not officially supported.
+It is possible that the |Product| works even on the earlier versions (pre |MinSupportedJenkinsVersion|), but
+pre |MinSupportedJenkinsVersion| Jenkins versions are not officially supported.
 
 Community Edition
 --------------------

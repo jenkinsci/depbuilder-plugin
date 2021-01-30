@@ -11,4 +11,8 @@
 
 .. |SupportPage| replace:: https://www.royalsloth.eu/support/
 
-.. |BugReports| replace:: https://github.com/RoyalSloth/DepBuilder/
+.. |BugReports| replace:: https://github.com/jenkinsci/depbuilder-plugin
+
+.. |MinSupportedJenkinsVersion| replace:: 2.235.1
+
+.. |LatestJenkinsVersion| replace:: 2.273

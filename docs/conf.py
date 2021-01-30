@@ -98,8 +98,8 @@ html_context = {
         ],
 
     "display_github": True,
-    "github_user": "RoyalSloth",
-    "github_repo": "DepBuilder",
+    "github_user": "jenkinsci",
+    "github_repo": "depbuilder-plugin",
     "github_version": "master",
     "conf_py_path": "/docs/",
 }
