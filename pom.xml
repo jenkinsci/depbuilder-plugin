@@ -29,8 +29,8 @@
     <packaging>hpi</packaging>
 
     <name>DepBuilder</name>
-    <description>Build project dependencies in a specific order by combining
-        existing Freestyle jobs and Pipelines together into the unified build workflow.
+    <description>Dependency builder and a tool for setting up large
+        build pipelines out of existing jobs.
     </description>
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
 
