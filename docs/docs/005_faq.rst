@@ -72,3 +72,10 @@ FAQ
 **Where can I find a documentation for an older version of the plugin?**
 
     Please check the |DocumentationAll| page.
+
+
+-------
+
+**Where can I buy the DepBuilder Pro version?**
+
+    You can find more info about pricing on the DepBuilder product page: |ProductPage|.

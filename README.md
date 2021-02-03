@@ -40,9 +40,10 @@ Create a new Jenkins project, pick your pipeline name and select the DepBuilder 
 
 ### 2. Define the build dependencies
 
-Create the build pipeline out of existing Jenkins jobs via a strict domain specific
+Define the build pipeline out of existing Jenkins jobs via a strict domain specific
 language that is checking for typos, missing build agents and other problems as you
-type.
+type. The build pipeline graph is automatically updated based on the pipeline definition
+in your script.
 
 <p align="center">
     <img src="docs/docs/images/intro/pipelineDefinition_min.png" alt="Definition of the DepBuilder Pipeline script"/>
@@ -67,7 +68,7 @@ the graph represent the build status:
 
 ## Documentation
 
-DepBuilder Documentation is located [here](https://docs.royalsloth.eu/depbuilder/latest/docs/000_intro.html).
+DepBuilder documentation is located [here](https://docs.royalsloth.eu/depbuilder/latest/docs/000_intro.html).
 
 
 ## Installation 

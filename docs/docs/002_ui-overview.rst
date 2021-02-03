@@ -85,12 +85,14 @@ install manually and are not part of the |Product|,
 such as `Jenkins GIT <https://plugins.jenkins.io/git/>`_ and
 `Jenkins SVN <https://plugins.jenkins.io/subversion/>`_.
 
-#. Select the SCM from the definition dropdown.
+#. Select the SCM option from the definition dropdown.
 
-#. Select the SCM option that you are using and enter a valid credentials.
+#. Select the SCM (Git, SVN, etc...), enter the project repository url and
+   valid SCM credentials.
 
-#. Add a relative path in :guilabel:`Pipeline File Location` input field that is
-   pointing to the build script in the repository.
+#. Add a relative path to the build script in the repository in the
+   :guilabel:`Pipeline File Location` field. The name of the build script
+   is not strictly defined and you can name it however you want.
 
 .. image:: images/ui/scmConfig_min.png
    :align: center
