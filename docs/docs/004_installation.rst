@@ -6,8 +6,9 @@ Installation
 |Product| was developed for the Jenkins |MinSupportedJenkinsVersion| and should be working
 up to the latest Jenkins version (|LatestJenkinsVersion|).
 
-It is possible that the |Product| works even on the earlier versions (pre |MinSupportedJenkinsVersion|), but
-pre |MinSupportedJenkinsVersion| Jenkins versions are not officially supported.
+It is possible that the |Product| works even on the earlier versions (pre |MinSupportedJenkinsVersion|),
+but they are not officially supported.
+
 
 Community Edition
 --------------------
@@ -30,6 +31,9 @@ Community Edition
 Alternatively, you could deploy the .hpi plugin file manually, as described in
 the :ref:`Installation-Manual` section.
 
+.. note:: For more info on managing Jenkins plugins, make sure to check out the official
+   `Jenkins documentation <https://www.jenkins.io/doc/book/managing/plugins/>`_.
+
 
 Pro Edition
 --------------------
@@ -39,7 +43,8 @@ the download page that contains the |Product| plugin, called ``DepBuilder-xx.hpi
 where ``xx`` represents the version number of the plugin.
 
 The Pro version has to be installed manually, by uploading the downloaded plugin file
-via the Jenkins UI as shown in the :ref:`Installation-Manual` section.
+via the Jenkins UI as shown in the :ref:`Installation-Manual` and
+:ref:`Entering-License` sections.
 
 
 .. _Installation-Manual:
@@ -72,8 +77,35 @@ Manual Installation
 5. Restart the Jenkins master node on which the plugin was installed.
 
 
-.. TODO: add instructions on how to upload the license file
+.. _Entering-License:
+
+Entering the License
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:guilabel:`Pro` After installing the |Product| Pro as described in the :ref:`Installation-Manual`,
+you have to enter the license which you have received via email after purchasing the |Product| Pro.
 
 
-.. note:: For more info on managing Jenkins plugins, make sure to check out the official
-   `Jenkins documentation <https://www.jenkins.io/doc/book/managing/plugins/>`_.
+.. image:: images/installation/managePluginsDepbuilder_min.png
+   :align: center
+   :alt: Showing DepBuilder configuration setting in Jenkins System Configuration section.
+
+
+Clicking on the DepBuilder configuration section should open the following form:
+
+.. image:: images/installation/depbuilderLicenseView_min.png
+   :align: center
+   :alt: DepBuilder form for entering the license
+
+
+Enter your license and click on the save button. Saving the license should update the
+following fields:
+
+* License type
+* Plugin version
+* License valid until
+
+
+.. note:: If your license has expired your builds are still going to work, but
+   with a Community set of features. For the current difference between the two,
+   see the :doc:`001_features` page.
