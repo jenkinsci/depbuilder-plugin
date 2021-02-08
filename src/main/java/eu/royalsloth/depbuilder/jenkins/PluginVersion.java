@@ -19,7 +19,8 @@ public enum PluginVersion {
 
     public static String getPluginVersion() {
         try {
-            return JenkinsUtil.getPluginVersion("DepBuilder");
+            String version = JenkinsUtil.getPluginVersion("depbuilder");
+            return version;
         } catch (Exception e) {
             return "";
         }
