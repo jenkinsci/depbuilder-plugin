@@ -5,6 +5,15 @@ Changelog
 
 |
 
+Changelog 1.0.1 - 1.0.3
+-------------------------
+*2021-02-08*
+
+- Resolving problems with deployment on Jenkins marketplace
+- Updated plugin description
+- Improved plugin icon
+- Updating documentation and fixing typos
+
 
 Changelog 1.0.0
 ---------------------

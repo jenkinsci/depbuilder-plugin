@@ -20,7 +20,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'DepBuilder'
-copyright = '2020, RoyalSloth'
+copyright = '2021, RoyalSloth'
 author = 'RoyalSloth'
 
 # The short X.Y version
@@ -105,7 +105,8 @@ html_context = {
 }
 
 html_show_sourcelink = False
-html_logo = "_static/docs_logo.png"
+#html_logo = "_static/docs_logo.png"
+html_logo = "_static/depbuilder_logo_min.svg"
 html_theme_options = {
     'logo_only': True,
     'display_version': True,
