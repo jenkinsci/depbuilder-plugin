@@ -8,7 +8,10 @@
 # - typescript compiler
 ###################################################################
 set -e
-DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )"
+DIR="$(
+  cd "$(dirname "${BASH_SOURCE[0]}")"
+  pwd -P
+)"
 cd "$DIR"
 
 ####################
@@ -20,5 +23,21 @@ tsc
 ###################
 # compile backend
 ###################
+TEST=1
+while [[ "$#" -gt 0 ]]; do
+  case $1 in
+  -n | --notest)
+    TEST=0
+    shift
+    ;;
+  esac
+done
+
 mvn clean
-mvn package
+if [[ $TEST == 1 ]]; then
+  echo "Package with tests"
+  mvn package
+else
+  echo "Package without tests"
+  mvn package -DskipTests
+fi
