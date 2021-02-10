@@ -5,7 +5,7 @@ Changelog
 
 |
 
-Changelog 1.0.4
+Changelog 1.0.6
 -------------------------
 *2021-02-10*
 
@@ -14,7 +14,7 @@ Changelog 1.0.4
   job to not be found at build time.
 
 
-Changelog 1.0.1 - 1.0.3
+Changelog 1.0.1 - 1.0.5
 -------------------------
 *2021-02-08*
 
