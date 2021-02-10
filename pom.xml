@@ -63,14 +63,6 @@
                 </configuration>
             </plugin>
         </plugins>
-        <!-- include generated javascript files -->
-        <resources>
-            <resource>
-                <directory>
-                    ${project.basedir}/src/main/webapp/js
-                </directory>
-            </resource>
-        </resources>
     </build>
 
     <developers>
