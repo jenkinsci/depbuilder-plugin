@@ -48,7 +48,7 @@ public class PersistBuildInfoAction extends InvisibleAction implements Action {
 
     public void addBuild(Run<?, ?> build) {
         BuildReference ref = new BuildReference();
-        ref.projectName = build.getParent().getName();
+        ref.projectName = build.getParent().getFullName();
         ref.buildNumber = build.getNumber();
         buildReferences.add(ref);
     }

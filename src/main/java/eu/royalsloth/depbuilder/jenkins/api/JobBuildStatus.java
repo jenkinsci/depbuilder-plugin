@@ -14,13 +14,15 @@ public class JobBuildStatus {
     public String projectName = "";
     public String buildStatus = "";
     public int buildNumber = -1;
+    /**
+     * Relative build uri that looks like job/foo/32 (without the trailing slash). This uri has to
+     * be concatenated together on the client side.
+     */
+    public String buildUri = "";
     public String duration = DslBuild.durationToString(0);
 
     /**
      * Parse all the relevant data from the Jenkins build info class
-     *
-     * @param build
-     * @return
      */
     public static JobBuildStatus from(Run<?, ?> build) {
         if (build == null) {
@@ -33,6 +35,7 @@ public class JobBuildStatus {
         info.buildNumber = build.getNumber();
 
         info.duration = JenkinsUtil.getBuildDurationString(build);
+        info.buildUri = build.getUrl();
         return info;
     }
 
@@ -42,7 +45,9 @@ public class JobBuildStatus {
             return "MISSING_BUILD";
         }
 
-        String parentName = build.getParent().getName();
+        // If the build is part of another parent (e.g: the user is using cloudbees-folder plugin)
+        // we have to store the unique name which is fullName (name: A, fullName: myFolder/A)
+        String parentName = build.getParent().getFullName();
         if (parentName == null) {
             // this should never happen
             return "MISSING_PARENT_NAME";

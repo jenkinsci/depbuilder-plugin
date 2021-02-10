@@ -154,6 +154,10 @@ interface JobBuildInfo {
     buildStatus: string
     buildNumber: number
     duration : string
+    /**
+     * Relative build uri, that looks like: job/foo/32 (without the trailing slash)
+     */
+    buildUri: string
 }
 
 function createIcon(buildStatus: string) : string {
@@ -370,7 +374,7 @@ class Graph {
         this.graphContainer = graphDomNode;
         this.buildNumber = this.graphContainer.buildNumber;
         this.buildUri = this.graphContainer.buildUri; // <domain/jenkins/job/<name>/<buildNumber>
-        this.baseUri = this.getBaseUri(this.buildUri);
+        this.baseUri = this.getBaseUri(this.buildUri); // domain/jenkins
         this.buildStatus = new Map<string, string>();
     }
 
@@ -379,6 +383,7 @@ class Graph {
         arr.pop() // remove "" (uri ends with '/')
         arr.pop() // remove project number
         arr.pop() // remove project name
+        arr.pop() // remove "job"
         return arr.join("/");
     }
 
@@ -426,8 +431,10 @@ class Graph {
                                             <button data-project="${projectName}" class="iconButton">${createIcon(buildStatus)}</button>`
                                          : "";
 
+            // We are adding tooltip to the node, since the name could be fairly long and will be cut.
+            // With tooltip at least the user can hover over the name and see the full project name.
             let htmlNode = `<div class="node-row">
-                                <div class="projectNameContainer"><a target="_blank" class="hoverLink projectName" href="${projectUri}">${projectName}</a></div>
+                                <div class="projectNameContainer"><a target="_blank" class="hoverLink projectName" title="${projectName}" href="${projectUri}">${projectName}</a></div>
                                 <span class="projectBuildSpacing"></span>
                                 <a target="_blank" class="link buildLink hoverLink" href="${buildUri}">#${buildNumberStr}</a>
                                 ${buttonCode}
@@ -677,7 +684,7 @@ class Graph {
                             // we would have to re-render the entire graph, which we shouldn't do
                             let anchor : HTMLAnchorElement = element;
                             anchor.innerText = jobBuildStatus.buildNumber == -1 ? "#" : "#" + jobBuildStatus.buildNumber;
-                            anchor.href = `${this.baseUri}/${jobBuildStatus.projectName}/${jobBuildStatus.buildNumber}/console`
+                            anchor.href = `${this.baseUri}/${jobBuildStatus.buildUri}/console`
                         } else {
                             // this should never happen unless we changed the build node html
                             console.warn("Found element is not an anchor element");

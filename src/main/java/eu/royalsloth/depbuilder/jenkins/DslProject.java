@@ -272,7 +272,8 @@ public class DslProject extends Project<DslProject, DslBuild> implements TopLeve
         Iterable<Job> jenkinsJobs = JenkinsUtil.getJenkins().allItems(Job.class);
         Map<String, String> uris = new HashMap<>();
         for (Job j : jenkinsJobs) {
-            uris.put(j.getName(), j.getAbsoluteUrl());
+            // @FUTURE: getAbsoluteUrl represents a potential problem with reverse proxies.
+            uris.put(j.getFullName(), j.getAbsoluteUrl());
         }
         return parsedNodes.stream().map(node -> {
             String uri = uris.getOrDefault(node.getId(), "");
@@ -439,7 +440,7 @@ public class DslProject extends Project<DslProject, DslBuild> implements TopLeve
             ComboBoxModel model = new ComboBoxModel();
             List<Job> jobs = Jenkins.get().getAllItems(Job.class);
             for (Job job : jobs) {
-                model.add(job.getDisplayName());
+                model.add(job.getFullName());
             }
             return model;
         }

@@ -102,7 +102,11 @@ public class JenkinsUtil {
         List<Job<?, ?>> allJobs = getJobs(project, Arrays.asList(jobName));
         for (Job<?, ?> job : allJobs) {
             // it should have only one job anyway
-            if (jobName.equals(job.getName())) {
+            //
+            // job.getName: A
+            // job.getFullName: A          (if A doesn't have a parent)
+            // job.getFullName: myFolder/A (if A has a parent)
+            if (jobName.equals(job.getFullName())) {
                 return job;
             }
         }
