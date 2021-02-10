@@ -380,11 +380,13 @@ existing Jenkins build types are suitable, such as:
 
 
 
-.. note:: If the job's name contains spaces, you have to declare it in quotes:
+.. note:: If the job's name contains spaces or special non-ascii characters, you have to declare it in quotes:
 
       .. code-block:: cpp
 
          "my name with spaces" -> jobWithNoSpaces
+
+         "myFolder/myJobName"  -> jobWithNoSpaces
 
 
 .. note:: Semicolons are optional end line delimiters, but are necessary in case

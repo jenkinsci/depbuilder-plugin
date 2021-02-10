@@ -3,6 +3,9 @@
 .vscode
 target
 work
+
+# ignoring compiled js files
 src/main/webapp/js/*.map
+src/main/webapp/js/*.js
 
 docs/_build

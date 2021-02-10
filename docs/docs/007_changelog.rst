@@ -5,6 +5,15 @@ Changelog
 
 |
 
+Changelog 1.0.4
+-------------------------
+*2021-02-10*
+
+- Resolved a problem that appeared with jobs that had parents.
+  If the user used the cloudbees-folder plugin that caused the
+  job to not be found at build time.
+
+
 Changelog 1.0.1 - 1.0.3
 -------------------------
 *2021-02-08*
