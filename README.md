@@ -6,11 +6,10 @@
 ## Introduction
 
 DepBuilder is a Jenkins plugin for building project dependencies in a specific
-order. The main idea behind the project is not to replace the currently
-available plugins, but to improve the experience of defining the Jenkins build
+order. The main idea is to improve the experience of defining the Jenkins build
 pipelines that consist of existing jobs and plugins, speeding up your build
 via automatic job parallelization and making the build process glancable
-through build visualization. 
+via live build visualization. 
 
 **Example:**
 
@@ -41,9 +40,9 @@ Create a new Jenkins project, pick your pipeline name and select the DepBuilder 
 ### 2. Define the build dependencies
 
 Define the build pipeline out of existing Jenkins jobs via a strict domain specific
-language that is checking for typos, missing build agents and other problems as you
-type. The build pipeline graph is automatically updated based on the pipeline definition
-in your script.
+language that is checking for typos, missing build agents, cyclic dependencies and 
+other problems as you type. The build pipeline graph below the script input box 
+is automatically updated based on the pipeline definition in your script.
 
 <p align="center">
     <img src="docs/docs/images/intro/pipelineDefinition_min.png" alt="Definition of the DepBuilder Pipeline script"/>
@@ -90,3 +89,9 @@ For a full list of features, see the [Features](https://docs.royalsloth.eu/depbu
 
 DepBuilder Community version is open source, released under the AGPL-3.0 license.
 See [License](LICENSE) for licensing details.
+
+
+## Changelog
+
+The DepBuilder's changelog is located 
+[here](https://docs.royalsloth.eu/depbuilder/latest/docs/007_changelog.html).

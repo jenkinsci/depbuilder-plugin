@@ -12,10 +12,10 @@ that usually form a larger product. These project dependencies has to be built i
 specific order and declaring the build pipeline with the existing Jenkins plugins is
 often a tedious process.
 
-The main idea behind the project is not to replace the currently available plugins (e.g. Jenkins Pipeline),
-but to improve the experience of defining the build pipeline that consists of **existing** jobs
-and plugins, speeding up your build via automatic job parallelization and making the build process
-glancable through the live build visualization.
+The main idea behind the project is to improve the user experience of defining the
+build pipeline that consists of multiple **existing** build jobs and plugins,
+speeding up your build via automatic job parallelization and making the build process
+glancable via live build visualization.
 
 **Example:**
 Say we have 4 jobs (A, B, C, D) which we would like to build in a specific order.
