@@ -333,7 +333,7 @@ public class DslParser {
             if (token.type == TokenType.EOF) {
                 throw ParseException.create(tokenizer, token,
                                             String.format("'%s' settings are missing a closing brace '}'",
-                                                          buildNodeSettings.getName()));
+                                                          buildNodeSettings.getJobName()));
             }
 
             // parsing identifier: assignment
@@ -353,9 +353,23 @@ public class DslParser {
             // a weird colon is missing error message which is really confusing, e.g:
             // A { ...
             // myProject
-            final String settingsId = buildNodeSettings.getName();
+            final String settingsId = buildNodeSettings.getJobName();
             final String settingsField = settingsIdentifier.text;
             switch (settingsField) {
+                case "name":
+                    expectAndParseColon(tokenizer, settingsId, settingsField);
+                    token = tokenizer.getNextToken();
+                    if (token.type != TokenType.STRING) {
+                        throw ParseException.create(tokenizer, token, String.format("expected name, got: %s", token.text));
+                    }
+
+                    String name = token.text;
+                    name= name.trim();
+                    if (name.isEmpty()) {
+                        throw ParseException.create(tokenizer, token, String.format("%s name field should not be empty", settingsId));
+                    }
+                    buildNodeSettings.setDisplayName(name);
+                    break;
                 case "agent":
                     token = expectAndParseColon(tokenizer, settingsId, settingsField);
                     List<String> parsedAgents = parseStringArray(tokenizer);
@@ -410,7 +424,7 @@ public class DslParser {
                         // mode was not found, or the input was empty, throw an exception
                         throw ParseException.create(tokenizer, token, String.format(
                                 "unknown onParentFailure mode for build node %s. Expected modes: %s, got: '%s'",
-                                buildNodeSettings.getName(), BuildSettings.ParentFailureMode.allModes(), token.text));
+                                buildNodeSettings.getJobName(), BuildSettings.ParentFailureMode.allModes(), token.text));
                     }
                     buildNodeSettings.setOnParentFailure(mode.get());
                     break;
@@ -433,7 +447,7 @@ public class DslParser {
                         if (weight < 0) {
                             throw ParseException.create(tokenizer, token,
                                                         String.format("node %s, expected weight > 0, got: %d",
-                                                                      buildNodeSettings.getName(), weight));
+                                                                      buildNodeSettings.getJobName(), weight));
                         }
                         buildNodeSettings.setWeight(weight);
                     } catch (NumberFormatException e) {

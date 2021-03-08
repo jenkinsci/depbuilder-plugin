@@ -115,7 +115,10 @@ interface DslBuild {
 }
 
 interface FinishedBuildJob {
+    /** name of the job (unique job name on Jenkins) */
     projectName: string
+    /** user defined name of the job (by default it's the same as project name) */
+    displayName: string
     projectUri: string
     children: string[]
 
@@ -411,6 +414,7 @@ class Graph {
         for (let i = 0; i < nodes.length; i++) {
             let node = nodes[i];
             let projectName = node['projectName'];
+            let displayName = node['displayName'];
             let projectUri = node['projectUri'];
             // when inspecting the build we are usually interested in inspecting the console
             // if the job is not yet build, the build uri is empty and should be filled later
@@ -434,7 +438,7 @@ class Graph {
             // We are adding tooltip to the node, since the name could be fairly long and will be cut.
             // With tooltip at least the user can hover over the name and see the full project name.
             let htmlNode = `<div class="node-row">
-                                <div class="projectNameContainer"><a target="_blank" class="hoverLink projectName" title="${projectName}" href="${projectUri}">${projectName}</a></div>
+                                <div class="projectNameContainer"><a target="_blank" class="hoverLink projectName" title=${projectName} href="${projectUri}">${displayName}</a></div>
                                 <span class="projectBuildSpacing"></span>
                                 <a target="_blank" class="link buildLink hoverLink" href="${buildUri}">#${buildNumberStr}</a>
                                 ${buttonCode}

@@ -220,6 +220,7 @@ window.addEventListener('load', function () {
             for (var i = 0; i < nodes.length; i++) {
                 var node = nodes[i];
                 var projectName = node['projectName'];
+                var displayName = node['displayName'];
                 var projectUri = node['projectUri'];
                 var buildUri = node['buildUri'] + "/console";
                 var buildNumber = node['buildNumber'];
@@ -228,7 +229,7 @@ window.addEventListener('load', function () {
                 var buildNumberStr = buildNumber == -1 ? "" : "" + buildNumber;
                 var buttonCode = this.SHOW_BUTTON ? "<span style=\"padding-right: 10px\"></span>\n                                            <button data-project=\"" + projectName + "\" class=\"iconButton\">" + createIcon(buildStatus) + "</button>"
                     : "";
-                var htmlNode = "<div class=\"node-row\">\n                                <div class=\"projectNameContainer\"><a target=\"_blank\" class=\"hoverLink projectName\" title=\"" + projectName + "\" href=\"" + projectUri + "\">" + projectName + "</a></div>\n                                <span class=\"projectBuildSpacing\"></span>\n                                <a target=\"_blank\" class=\"link buildLink hoverLink\" href=\"" + buildUri + "\">#" + buildNumberStr + "</a>\n                                " + buttonCode + "\n                            </div>\n                            <div class=\"node-row\">\n                                <p class=\"duration\">" + duration + "</p>\n                            </div>\n                            ";
+                var htmlNode = "<div class=\"node-row\">\n                                <div class=\"projectNameContainer\"><a target=\"_blank\" class=\"hoverLink projectName\" title=" + projectName + " href=\"" + projectUri + "\">" + displayName + "</a></div>\n                                <span class=\"projectBuildSpacing\"></span>\n                                <a target=\"_blank\" class=\"link buildLink hoverLink\" href=\"" + buildUri + "\">#" + buildNumberStr + "</a>\n                                " + buttonCode + "\n                            </div>\n                            <div class=\"node-row\">\n                                <p class=\"duration\">" + duration + "</p>\n                            </div>\n                            ";
                 dagreGraph.setNode(projectName, { labelType: "html", class: buildStatus, label: htmlNode, rx: 4, ry: 4 });
             }
             for (var i = 0; i < nodes.length; i++) {

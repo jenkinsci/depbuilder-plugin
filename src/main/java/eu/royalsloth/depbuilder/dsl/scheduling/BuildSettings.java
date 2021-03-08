@@ -22,8 +22,16 @@ public class BuildSettings {
     public static final Duration INFINITE_DURATION = Duration.ofDays(10_000);
     public static final Duration DEFAULT_BUILD_DURATION = Duration.ofHours(2);
 
-    // settable fields
-    private final String buildNodeName;
+    /*
+     * Unique Jenkins job name
+     */
+    private final String jobName;
+    /**
+     * Custom name of the job that will be displayed in the UI (if set).
+     * When referring to the jobs (or fetching some data related to a certain job),
+     * you should always use the jobName field.
+     */
+    private String displayName = "";
     private List<BuildAgent> agents = new LinkedList<>();
     private ParentFailureMode onParentFailure = ParentFailureMode.ABORT;
     private Duration maxDuration = DEFAULT_BUILD_DURATION;
@@ -37,8 +45,8 @@ public class BuildSettings {
      */
     private List<UnknownSetting> unknownSettings = new LinkedList<>();
 
-    public BuildSettings(String buildNodeName) {
-        this.buildNodeName = buildNodeName;
+    public BuildSettings(String jobName) {
+        this.jobName = jobName;
     }
 
     /**
@@ -46,7 +54,8 @@ public class BuildSettings {
      * fields over. If any of the fields in the settings are changed, this method should change as well.
      */
     public BuildSettings(BuildSettings settingsToCopy) {
-        this.buildNodeName = settingsToCopy.getName();
+        this.jobName = settingsToCopy.jobName;
+        this.displayName = settingsToCopy.displayName;
         this.weight = settingsToCopy.weight;
 
         // copy an array of build agents
@@ -71,8 +80,19 @@ public class BuildSettings {
     ////////////////////////////
     // getters & setters
     ///////////////////////////
-    public String getName() {
-        return buildNodeName;
+    public String getJobName() {
+        return jobName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+        if (this.displayName.isEmpty()) {
+            return this.jobName;
+        }
+        return displayName;
     }
 
     public List<BuildAgent> getAgents() {
@@ -110,7 +130,6 @@ public class BuildSettings {
     public void setWeight(int weight) {
         this.weight = weight;
     }
-
 
     public void addUnknownSetting(UnknownSetting unknownSetting) {
         this.unknownSettings.add(unknownSetting);

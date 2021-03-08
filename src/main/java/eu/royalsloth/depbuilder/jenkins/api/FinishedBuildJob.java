@@ -11,6 +11,10 @@ import java.util.Set;
 public class FinishedBuildJob {
     // project related properties
     public String projectName;
+    /**
+     * The name that will be displayed in the UI (if set)
+     */
+    public String displayName;
     public Set<String> children;
     public String projectUri;
 

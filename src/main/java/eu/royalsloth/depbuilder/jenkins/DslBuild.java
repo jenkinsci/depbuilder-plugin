@@ -173,7 +173,11 @@ public class DslBuild extends Build<DslProject, DslBuild> {
 
     /**
      * Get build status of the job builds (which job was success, which failed which was aborted). If the
-     * build is still in progress, only partial status will be reported (see finished flag).
+     * build is still in progress, only partial status will be reported. Finished
+     * flag of the returned structure determines if the build is still in progress.
+     * <p>
+     * This method will be periodically called by the frontend in order to update parts
+     * of the UI while the build is in progress.
      */
     private ProjectBuildStatus getBuildStatus() {
         PersistBuildInfoAction action = getAction(PersistBuildInfoAction.class);
@@ -341,6 +345,7 @@ public class DslBuild extends Build<DslProject, DslBuild> {
             for (ConfigGraphNode graphNode : graphNodes) {
                 FinishedBuildJob job = new FinishedBuildJob();
                 job.projectName = graphNode.projectName;
+                job.displayName = graphNode.displayName;
                 job.projectUri = graphNode.projectUri;
                 job.children = graphNode.children;
 

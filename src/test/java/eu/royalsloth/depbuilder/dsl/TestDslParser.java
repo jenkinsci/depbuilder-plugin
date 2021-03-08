@@ -53,12 +53,15 @@ public class TestDslParser {
     @Test
     public void parseSetting() throws ParseException {
         String input = "A {\n"
+                + "name: \"custom name\"\n"
                 + "agent: [any] \n"
                 + "weight: 2\n"
                 + "onParentFailure: BUILD\n"
                 + "}\n";
         List<ParsedBuildJob> buildNodes = DslParser.parseBuildNoVerify(input).parsedJobs;
         BuildSettings settings = buildNodes.get(0).getBuildSettings();
+        assertEquals("A", settings.getJobName(), "Wrong job name");
+        assertEquals("custom name", settings.getDisplayName(), "Wrong custom name");
         assertEquals(Arrays.asList("any"), settings.getAgentNames(), "Wrong agent setting parsed");
         assertEquals(ParentFailureMode.BUILD, settings.getOnParentFailure(), "Wrong parent failure");
         Duration defaultDuration = Duration.ofHours(2);
@@ -106,6 +109,8 @@ public class TestDslParser {
         settingsVerifier.setKnownAgents("build1", "build2");
         List<ParsedBuildJob> buildNodes = DslParser.parseBuild(input, settingsVerifier).parsedJobs;
         BuildSettings settings = buildNodes.get(0).getBuildSettings();
+        assertEquals("A", settings.getJobName());
+        assertEquals("A", settings.getDisplayName());
         assertEquals(Arrays.asList("build1", "build2"), settings.getAgentNames(), "Wrong agent parsed");
         assertEquals(ParentFailureMode.ABORT, settings.getOnParentFailure(), "Wrong on parent failure setting");
         assertEquals(Duration.ofMinutes(15), settings.getMaxDuration(), "Wrong build time parsed");
@@ -201,7 +206,7 @@ public class TestDslParser {
 
         ParsedBuildJob node = buildNodes.get(0);
         BuildSettings settings = node.getBuildSettings();
-        assertEquals("A", settings.getName());
+        assertEquals("A", settings.getJobName());
 
         List<UnknownSetting> unknownSettings = settings.getUnknownSettings();
         assertEquals(4, unknownSettings.size(), "Wrong size of unknown settings");

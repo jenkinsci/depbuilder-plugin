@@ -12,11 +12,13 @@ import java.util.Set;
 @SuppressFBWarnings(value="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification = "this is public api used by the frontend")
 public class ConfigGraphNode {
     public final String projectName;
+    public final String displayName;
     public final Set<String> children;
     public final String projectUri;
 
     public ConfigGraphNode(ParsedBuildJob j, String projectUri) {
         this.projectName = j.getId();
+        this.displayName = j.getBuildSettings().getDisplayName();
         this.children = j.getChildren();
         this.projectUri = projectUri;
     }

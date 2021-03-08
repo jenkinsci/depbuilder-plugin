@@ -8,13 +8,14 @@ window.addEventListener('load', function () {
         for (var i = 0; i < nodes.length; i++) {
             var node = nodes[i];
             var projectName = node['projectName'];
+            var displayName = node['displayName'];
             var projectUri = node['projectUri'];
             var htmlNode = "";
             if (projectUri == undefined) {
                 htmlNode = "<p>" + projectName + "</p>";
             }
             else {
-                htmlNode = "<a class=\"hoverLink\" target=\"_blank\" href=" + projectUri + ">" + projectName + "</a>";
+                htmlNode = "<a class=\"hoverLink\" target=\"_blank\" href=" + projectUri + ">" + displayName + "</a>";
             }
             g.setNode(projectName, { labelType: "html", label: htmlNode, rx: 4, ry: 4 });
         }
@@ -95,7 +96,7 @@ window.addEventListener('load', function () {
         })
             .catch(function (error) {
             if (error instanceof Error) {
-                var buildJobs = [{ "projectName": "Error:\n" + error.message, "children": [], projectUri: "" }];
+                var buildJobs = [{ "displayName": "Error:\n" + error.message, "projectName": "error", "children": [], projectUri: "" }];
                 var cycle = [];
                 createGraph(buildJobs, cycle, renderElement);
             }

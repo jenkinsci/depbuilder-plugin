@@ -5,6 +5,7 @@
 // BuildNode presents one job on configuration page
 interface BuildNode {
     projectName: string
+    displayName: string
     projectUri: string
     children: string[]
 }
@@ -24,13 +25,14 @@ function createGraph(nodes: BuildNode[], cycle: string[], renderElement: string)
     for (let i = 0; i < nodes.length; i++) {
         let node = nodes[i];
         let projectName = node['projectName'];
+        let displayName = node['displayName'];
         let projectUri = node['projectUri'];
 
         let htmlNode = "";
         if (projectUri == undefined) {
             htmlNode = `<p>${projectName}</p>`
         } else {
-            htmlNode = `<a class="hoverLink" target="_blank" href=${projectUri}>${projectName}</a>`
+            htmlNode = `<a class="hoverLink" target="_blank" href=${projectUri}>${displayName}</a>`
         }
         // beside label we can add class: 'my-class' to style a certain node
         g.setNode(projectName, {labelType:"html", label: htmlNode, rx: 4, ry: 4});
@@ -146,7 +148,7 @@ function displayGraph() {
     .catch(error => {
         if (error instanceof Error) {
             // display error node as a single node in the chart
-            let buildJobs = [{"projectName": "Error:\n" + error.message, "children": [], projectUri: ""}];
+            let buildJobs = [{"displayName": "Error:\n" + error.message, "projectName": "error", "children": [], projectUri: ""}];
             let cycle : string[] = [];
             createGraph(buildJobs, cycle, renderElement);
         } else {
