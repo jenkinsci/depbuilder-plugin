@@ -37,12 +37,59 @@ public class Scheduler {
     }
 
     public Scheduler(BuildLayers buildLayers, SchedulerSettings settings, Instant startTime) {
+        this(buildLayers, settings, startTime, new ArrayList<>());
+    }
+
+    public Scheduler(BuildLayers buildLayers, SchedulerSettings settings, Instant startTime,
+            List<String> startBuildWithNodes) {
         this.startTime = startTime;
         this.settings = settings;
         this.buildLayers = buildLayers;
         if (buildLayers.hasCycle()) {
             throw new IllegalStateException(
                     "Provided build layers contain a cycle: " + buildLayers.getBuildCycle());
+        }
+
+        // check if the user selected only one part of the graph for building
+        final boolean partialGraphBuild = !startBuildWithNodes.isEmpty();
+        if (partialGraphBuild) {
+            // user wanted to build only a small chunk of the graph, steps:
+            // 1. Set the status of all jobs to NO_BUILD
+            // 2. Find the children nodes of the user selected nodes and
+            //    set their status to NONE (only NONE nodes are scheduled)
+            for (List<BuildJob> layer : buildLayers.getLayers()) {
+                for (BuildJob job : layer) {
+                    job.setBuildStatus(BuildStatus.NO_BUILD);
+                    finished.add(job.getId());
+                }
+            }
+
+            // find the chosen nodes from which the build process should start
+            // and mark all their childs as ready to build (NONE status)
+            for (String startingJob : startBuildWithNodes) {
+                BuildJob job = buildLayers.getBuildNode(startingJob);
+                final boolean startingJobWasNotFound = job == null;
+                if (startingJobWasNotFound) {
+                    throw new IllegalStateException(String.format("Can't start the partial build, the selected job '%s' does not exist in the build graph", startingJob));
+                }
+                markNodesAsReadyToBuild(job);
+            }
+        }
+    }
+
+    protected void markNodesAsReadyToBuild(BuildJob job) {
+        job.setBuildStatus(BuildStatus.NONE);
+        // we have to remove such jobs from finished set, otherwise the
+        // scheduler will think there are still nodes to build and won't finish
+        finished.remove(job.getId());
+        for (BuildJob child : job.getChildren()) {
+            child.setBuildStatus(BuildStatus.NONE);
+            finished.remove(child.getId());
+            boolean isLeafNode = child.getChildren().isEmpty();
+            if (isLeafNode) {
+                return;
+            }
+            markNodesAsReadyToBuild(child);
         }
     }
 

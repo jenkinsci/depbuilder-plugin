@@ -130,7 +130,8 @@ public class BuildLayers {
             // Either there is a cycle in the graph or there isn't - transitive dependencies don't matter.
             // Given that number of nodes in this graph is not going to be that big (nobody is going to build
             // 1000 dependencies with this software), I just left the working and debugged code intact.
-            // This code would be probably way simpler without checking for things in layers.
+            // This code would probably be way simpler with a simple depth first search traversal.
+            //
             //      A
             //   /  |  \
             //  B   |   C

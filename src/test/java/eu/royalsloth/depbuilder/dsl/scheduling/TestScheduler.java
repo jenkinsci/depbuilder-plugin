@@ -5,6 +5,8 @@ import eu.royalsloth.depbuilder.dsl.ParseException;
 import eu.royalsloth.depbuilder.dsl.ParsedBuildJob;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 
 import static eu.royalsloth.depbuilder.dsl.scheduling.ScheduledNode.ScheduledNodeStatus;
@@ -195,10 +197,79 @@ public class TestScheduler {
         assertEquals(ScheduledNodeStatus.ABORT, node.getStatus(), "Wrong node build status");
     }
 
+    /**
+     * Checks if we can build only a small chunk of the graph that was selected
+     * by the user (from node B downwards).
+     */
+    @Test
+    public void testPartialGraphBuild() throws Exception {
+        /* Starting the build with node B. Nodes (B, C, D) should have status NONE,
+           while the rest of the nodes should have status NOT_BUILD
+           A      E
+           |      |
+          (B)      F
+            \   /
+              C
+              |
+              D
+         */
+        String input = "A -> B -> C -> D; E -> F -> C -> D";
+        Scheduler scheduler = createScheduler(input, Arrays.asList("B"));
+        BuildLayers layers = scheduler.buildLayers;
+        for (List<BuildJob> layer : layers.getLayers()) {
+            for (BuildJob job : layer) {
+                switch (job.getId()) {
+                    case "B":
+                    case "C":
+                    case "D":
+                        assertEquals(job.getBuildStatus(), BuildStatus.NONE,
+                                     "Wrong build status for job: " + job.getId());
+                        break;
+                    default:
+                        assertEquals(job.getBuildStatus(), BuildStatus.NO_BUILD,
+                                     "Wrong build status for job: " + job.getId());
+                }
+            }
+        }
+
+        ScheduledNode nodeB = scheduler.getNext();
+        assertEquals("B", nodeB.getBuildJob().getId());
+        ScheduledNode waitNode = scheduler.getNext();
+        assertEquals(ScheduledNodeStatus.WAIT, waitNode.getStatus());
+
+        // finish B, expecting next element to appear
+        scheduler.successBuild(nodeB);
+        ScheduledNode nodeC = scheduler.getNext();
+        assertEquals("C", nodeC.getBuildJob().getId());
+
+        // next node should be wait, until we finish building C
+        waitNode = scheduler.getNextNode();
+        assertEquals(ScheduledNodeStatus.WAIT, waitNode.getStatus());
+        scheduler.successBuild(nodeC);
+
+        ScheduledNode nodeD = scheduler.getNextNode();
+        assertEquals("D", nodeD.getBuildJob().getId());
+
+        // next node should be wait, until we finish building D
+        waitNode = scheduler.getNextNode();
+        assertEquals(ScheduledNodeStatus.WAIT, waitNode.getStatus());
+        scheduler.successBuild(nodeD);
+
+        ScheduledNode finished = scheduler.getNextNode();
+        assertEquals(ScheduledNodeStatus.FINISHED, finished.getStatus());
+    }
+
     private Scheduler createScheduler(String input) throws ParseException {
         List<ParsedBuildJob> nodes = DslParser.parseBuildNoVerify(input).parsedJobs;
         BuildLayers layers = BuildLayers.topologicalSort(nodes);
         SchedulerSettings defaultSettings = new SchedulerSettings();
         return new Scheduler(layers, defaultSettings);
+    }
+
+    private Scheduler createScheduler(String input, List<String> startNodes) throws ParseException {
+        List<ParsedBuildJob> nodes = DslParser.parseBuildNoVerify(input).parsedJobs;
+        BuildLayers layers = BuildLayers.topologicalSort(nodes);
+        SchedulerSettings defaultSettings = new SchedulerSettings();
+        return new Scheduler(layers, defaultSettings, Instant.now(), startNodes);
     }
 }
