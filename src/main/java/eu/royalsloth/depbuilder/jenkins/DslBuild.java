@@ -14,9 +14,14 @@ import hudson.scm.SCM;
 import hudson.tasks.BuildStep;
 import hudson.tasks.BuildWrapper;
 import hudson.tasks.Builder;
+import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import net.sf.json.JSONObject;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
+import org.kohsuke.stapler.verb.POST;
 
 import javax.annotation.CheckForNull;
 import java.io.File;
@@ -45,6 +50,7 @@ public class DslBuild extends Build<DslProject, DslBuild> {
 
     // BuildPlugin constructors are used via reflection deep within the Jenkins
     public DslBuild(DslProject project) throws IOException {
+        // for each DslBuild. the same DslProject instance is being used.
         super(project);
     }
 
@@ -169,6 +175,29 @@ public class DslBuild extends Build<DslProject, DslBuild> {
     public JSONObject getDslBuild() {
         ProjectGraph graph = getBuildGraph();
         return JSONObject.fromObject(graph);
+    }
+
+    /**
+     * Endpoint that allows the user to trigger a partial build of the pipeline.
+     * This action is usually triggered by clicking on the play icon of the node in
+     * pipeline frontend.
+     */
+    @POST
+    public void doStartPartialBuild(StaplerRequest req, StaplerResponse rsp, @QueryParameter String job) {
+        JenkinsUtil.getJenkins().checkPermission(Jenkins.ADMINISTER);
+        if (job == null) {
+            throw new IllegalStateException("You should provide a job query parameter");
+        }
+
+        // verify that the provided job exists on Jenkins
+        job = job.trim();
+        JenkinsUtil.getJob(getProject(), job);
+
+        // seconds to wait before starting the build
+        int quietPeriod = 0;
+        CauseAction cause = ParameterizedJobMixIn.getBuildCause(this.getProject(), req);
+        PartialBuildAction action = new PartialBuildAction(Arrays.asList(job));
+        this.getProject().scheduleBuild2(quietPeriod, cause, action);
     }
 
     /**
@@ -424,11 +453,12 @@ public class DslBuild extends Build<DslProject, DslBuild> {
         return build;
     }
 
-    public static Scheduler schedulerFactory(PrintStream logger, BuildLayers layers, SchedulerSettings settings, Instant startTime) {
-        logger.println("");
+    public static Scheduler schedulerFactory(PrintStream logger, BuildLayers layers,
+            SchedulerSettings settings, Instant startTime, List<String> partialBuilds) {
+        logger.println();
         if (PluginVersion.isCommunity()) {
             logger.println("Building with DepBuilder Community plugin, v: " + PluginVersion.version);
-            return new Scheduler(layers, settings, startTime);
+            return new Scheduler(layers, settings, startTime, partialBuilds);
         } else {
             // @PRO: scheduler with more features
             //
@@ -437,7 +467,7 @@ public class DslBuild extends Build<DslProject, DslBuild> {
             logger.println("You are using the Community DepBuilder plugin with a valid Pro version.\n"
                                    + "If you would like to use Pro features, please download the Pro"
                                    + "plugin version.");
-            return new Scheduler(layers, settings, startTime);
+            return new Scheduler(layers, settings, startTime, partialBuilds);
         }
     }
 
@@ -499,6 +529,11 @@ public class DslBuild extends Build<DslProject, DslBuild> {
                 }
             }
 
+            List<String> partialBuilds = new ArrayList<>();
+            PartialBuildAction partialBuildAction = getAction(PartialBuildAction.class);
+            if (partialBuildAction != null) {
+                partialBuilds = partialBuildAction.graphJobsToBuild;
+            }
             final DslProject project = getProject();
             final Instant buildStart = Instant.now();
 
@@ -529,7 +564,7 @@ public class DslBuild extends Build<DslProject, DslBuild> {
             AssignToNode.allJobsShouldHaveOnlineAgent(verifiedBuild);
 
             BuildLayers layers = BuildLayers.topologicalSort(verifiedBuild.parsedJobs);
-            this.scheduler = schedulerFactory(listener.getLogger(), layers, verifiedBuild.schedulerSettings, buildStart);
+            this.scheduler = schedulerFactory(listener.getLogger(), layers, verifiedBuild.schedulerSettings, buildStart, partialBuilds);
             final Duration maxProjectBuildDuration = verifiedBuild.schedulerSettings.maxDuration;
 
             // main scheduler loop that keeps checking if the
@@ -549,7 +584,7 @@ public class DslBuild extends Build<DslProject, DslBuild> {
                     // The build could either stop due to build errors or
                     // timing out (aborted build). We have to distinguish between the
                     // two in order to display the right light/color in the UI.
-                    listener.getLogger().println("");
+                    listener.getLogger().println();
                     if (scheduler.wasAborted()) {
                         return Result.ABORTED;
                     }
@@ -570,7 +605,7 @@ public class DslBuild extends Build<DslProject, DslBuild> {
                         final boolean buildDurationExceeded =
                                 maxProjectBuildDuration.compareTo(buildDuration) < 0;
                         if (buildDurationExceeded) {
-                            listener.getLogger().println("");
+                            listener.getLogger().println();
                             listener.getLogger()
                                     .println(String.format("Max build duration %s exceeded, terminating build", maxProjectBuildDuration));
                             return Result.ABORTED;
@@ -605,7 +640,7 @@ public class DslBuild extends Build<DslProject, DslBuild> {
                             }
                         }
 
-                        listener.getLogger().println("");
+                        listener.getLogger().println();
                         return Result.ABORTED;
                     }
 
@@ -654,7 +689,7 @@ public class DslBuild extends Build<DslProject, DslBuild> {
                 scheduler.addQueuedBuild(buildInFuture);
             }
             // add an empty line at the end of the report
-            listener.getLogger().println("");
+            listener.getLogger().println();
 
             ////////////////////////////
             // This is old code for building the project, it's probably irrelevant for our
