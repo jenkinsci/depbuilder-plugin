@@ -1,4 +1,4 @@
-.hidden {
+.displayNone {
     display: none;
 }
 
@@ -107,8 +107,19 @@ This resets their default settings */
     margin-right: 5px;
 }
 
-button.hidden {
+button.displayNone {
     display: none;
+}
+
+.iconButton {
+    transition: visibility 0.3s ease-in, opacity 0.3s ease-in;
+    opacity: 1;
+}
+
+.iconButton.hidden {
+    visibility: hidden;
+    user-select: none;
+    opacity: 0;
 }
 
 /**********************************
@@ -205,7 +216,7 @@ node that was not built is not
 .node-row .projectName {
     white-space: nowrap;
     max-width: 15ch;
-    overflow: hidden;
+    overflow: displayNone;
     text-overflow: ellipsis;
 }
 
@@ -228,7 +239,7 @@ node that was not built is not
 }
 
 .iconButton {
-    padding: 0 0 0 5px;
+    padding: 0 2px 0 5px;
     margin: 0;
     border: none;
     display: inline-block;
@@ -340,7 +351,7 @@ save|cancel buttons. Changing z-index from 10 to 9 fixes this problem.
     max-height: calc(100vh - 1rem);
 
     flex-direction: column;
-    overflow: hidden;
+    overflow: displayNone;
     -ms-overflow-y: visible;
     background-color: #fff;
     padding: 20px 10px 15px 10px;
@@ -380,5 +391,5 @@ save|cancel buttons. Changing z-index from 10 to 9 fixes this problem.
 /* makes the element unscrollable (apply it to html element when the
  modal is being opened) */
 .is-clipped {
-    overflow: hidden !important;
+    overflow: displayNone !important;
 }

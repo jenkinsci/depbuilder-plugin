@@ -33,9 +33,10 @@ public class AssignToNode extends InvisibleAction implements LabelAssignmentActi
 
     @Override
     public Label getAssignedLabel(@NonNull SubTask task) {
-        // TODO: this is interesting, we could try different things here
-        // SubTask t = task;
-        // t.getSameNodeConstraint()
+        // @FUTURE: this could be useful in case we ever support different
+        // agent assignment strategies.
+        //
+        // Node computer = task.getLastBuiltOn();
         return node.getSelfLabel();
     }
 
@@ -43,7 +44,6 @@ public class AssignToNode extends InvisibleAction implements LabelAssignmentActi
     public boolean shouldSchedule(List<Action> actions) {
         // TODO: I am not sure if this action is necessary. This part was only
         // added because it was present in another plugin, but it might be useless for our case
-        System.out.println("====== Should schedule trigger: " + actions);
         List<AssignToNode> assignments = Util.filter(actions, AssignToNode.class);
         for (AssignToNode assign : assignments) {
             if (assign.node.getSelfLabel().equals(this.node.getSelfLabel())) {

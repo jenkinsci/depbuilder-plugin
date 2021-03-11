@@ -385,6 +385,10 @@ public class DslBuild extends Build<DslProject, DslBuild> {
                     // some builds will be missing (it's a normal behavior)
                     job.buildNumber = -1;
                     job.buildUri = "";
+                    // @NOTE: if the user built only a part of the graph, this
+                    // status should be set to NOT_BUILD. Nevertheless, after
+                    // the build we don't know which job is missing history and
+                    // which job doesn't have it (due to the partial build)
                     job.buildStatus = BuildStatus.NONE.toString();
                     job.buildDuration = durationToString(0);
                 } else {

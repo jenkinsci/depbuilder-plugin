@@ -5,6 +5,21 @@ var ICON_RESTART = "<svg class=\"icon RESTART\" xmlns=\"http://www.w3.org/2000/s
 var ICON_PIPELINE = "<svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path class=\"iconColor\" d=\"M504.971 359.029c9.373 9.373 9.373 24.569 0 33.941l-80 79.984c-15.01 15.01-40.971 4.49-40.971-16.971V416h-58.785a12.004 12.004 0 0 1-8.773-3.812l-70.556-75.596 53.333-57.143L352 336h32v-39.981c0-21.438 25.943-31.998 40.971-16.971l80 79.981zM12 176h84l52.781 56.551 53.333-57.143-70.556-75.596A11.999 11.999 0 0 0 122.785 96H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12zm372 0v39.984c0 21.46 25.961 31.98 40.971 16.971l80-79.984c9.373-9.373 9.373-24.569 0-33.941l-80-79.981C409.943 24.021 384 34.582 384 56.019V96h-58.785a12.004 12.004 0 0 0-8.773 3.812L96 336H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h110.785c3.326 0 6.503-1.381 8.773-3.812L352 176h32z\"></path></svg>";
 var ICON_BAN = "<svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path class=\"iconColor\" d=\"M256 8C119.034 8 8 119.033 8 256s111.034 248 248 248 248-111.034 248-248S392.967 8 256 8zm130.108 117.892c65.448 65.448 70 165.481 20.677 235.637L150.47 105.216c70.204-49.356 170.226-44.735 235.638 20.676zM125.892 386.108c-65.448-65.448-70-165.481-20.677-235.637L361.53 406.784c-70.203 49.356-170.226 44.736-235.638-20.676z\"></path></svg>";
 var ICON_CANCEL_X = "<svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 352 512\"><path class=\"iconColor\" d=\"M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z\"></path></svg>";
+var zoomFilter = function (event) {
+    if (event.button) {
+        return false;
+    }
+    if (event.type === 'dblclick') {
+        return false;
+    }
+    if (event.type === 'wheel' && event.shiftKey) {
+        return true;
+    }
+    if (!event.button && event.type !== 'wheel') {
+        return true;
+    }
+    return false;
+};
 var PipelineModal = (function () {
     function PipelineModal() {
         var _this = this;
@@ -61,13 +76,15 @@ var PipelineModal = (function () {
 window.addEventListener('load', function () {
     var pipelineModal = new PipelineModal();
     pipelineModal.addToElement(document.body);
-    var StatusOfBuild;
-    (function (StatusOfBuild) {
-        StatusOfBuild["IN_PROGRESS"] = "IN_PROGRESS";
-        StatusOfBuild["ABORT"] = "ABORT";
-        StatusOfBuild["ERROR"] = "ERROR";
-        StatusOfBuild["SUCCESS"] = "SUCCESS";
-    })(StatusOfBuild || (StatusOfBuild = {}));
+    var BuildStatus;
+    (function (BuildStatus) {
+        BuildStatus["ERROR"] = "ERROR";
+        BuildStatus["ABORT"] = "ABORT";
+        BuildStatus["SUCCESS"] = "SUCCESS";
+        BuildStatus["IN_PROGRESS"] = "IN_PROGRESS";
+        BuildStatus["NO_BUILD"] = "NO_BUILD";
+        BuildStatus["NONE"] = "NONE";
+    })(BuildStatus || (BuildStatus = {}));
     ;
     function createIcon(buildStatus) {
         switch (buildStatus) {
@@ -84,8 +101,8 @@ window.addEventListener('load', function () {
     var GRAPH_PROGRESS_UPDATE_MS = 5000;
     var LATEST_BUILD_CHECK_MS = 10000;
     var MAX_BUILDS_FETCHED = 20;
-    var GraphDomNode = (function () {
-        function GraphDomNode(projectName, buildNumber, buildUrl) {
+    var GraphTitleBar = (function () {
+        function GraphTitleBar(projectName, buildNumber, buildUrl) {
             var _this = this;
             this.currentState = "NONE";
             this.projectName = projectName;
@@ -112,7 +129,7 @@ window.addEventListener('load', function () {
                 throw new Error("Cancel build button selector does not exist");
             }
             this.cancelBuildButton.onclick = function () { return _this.abortBuildEvent(); };
-            this.updateBuildStatus("NONE");
+            this.updateBuildStatus(BuildStatus.NONE);
             var namespaceUri = "http://www.w3.org/2000/svg";
             this.svg = document.createElementNS(namespaceUri, "svg");
             this.svg.setAttribute('id', "buildGraph" + this.buildNumber);
@@ -124,7 +141,7 @@ window.addEventListener('load', function () {
             this.svg.appendChild(text);
             this.container.appendChild(this.svg);
         }
-        GraphDomNode.prototype.showPipeline = function () {
+        GraphTitleBar.prototype.showPipeline = function () {
             var _this = this;
             var uri = this.buildUri + "api/json?tree=pipeline";
             if (!this.pipeline) {
@@ -148,7 +165,7 @@ window.addEventListener('load', function () {
                 this.showModal();
             }
         };
-        GraphDomNode.prototype.showModal = function () {
+        GraphTitleBar.prototype.showModal = function () {
             pipelineModal.buildNumber.innerText = "#" + this.buildNumber;
             if (this.pipeline) {
                 pipelineModal.textArea.value = this.pipeline;
@@ -158,27 +175,27 @@ window.addEventListener('load', function () {
             }
             pipelineModal.showModal();
         };
-        GraphDomNode.prototype.updateBuildStatus = function (buildStatus) {
+        GraphTitleBar.prototype.updateBuildStatus = function (buildStatus) {
             this.currentState = buildStatus;
             this.progressLight.setAttribute("class", "graphLight " + buildStatus);
             switch (buildStatus) {
                 case "IN_PROGRESS":
-                    this.cancelBuildButton.classList.remove("hidden");
+                    this.cancelBuildButton.classList.remove("displayNone");
                     break;
                 default:
-                    this.cancelBuildButton.classList.add("hidden");
+                    this.cancelBuildButton.classList.add("displayNone");
             }
         };
-        GraphDomNode.prototype.updateDuration = function (duration) {
+        GraphTitleBar.prototype.updateTotalBuildDuration = function (duration) {
             this.duration.innerText = "(" + duration + ")";
         };
-        GraphDomNode.prototype.abortBuildEvent = function () {
+        GraphTitleBar.prototype.abortBuildEvent = function () {
             if (this.currentState == "IN_PROGRESS") {
                 if (confirm("Do you really want to abort #" + this.buildNumber + "?")) {
                     try {
                         var abortUrl = this.buildUri + "stop";
                         new Ajax.Request(abortUrl);
-                        this.cancelBuildButton.classList.add("hidden");
+                        this.cancelBuildButton.classList.add("displayNone");
                     }
                     catch (error) {
                         console.error(error);
@@ -186,15 +203,14 @@ window.addEventListener('load', function () {
                 }
             }
         };
-        return GraphDomNode;
+        return GraphTitleBar;
     }());
     ;
     var Graph = (function () {
         function Graph(graphDomNode) {
-            this.SHOW_BUTTON = false;
-            this.graphContainer = graphDomNode;
-            this.buildNumber = this.graphContainer.buildNumber;
-            this.buildUri = this.graphContainer.buildUri;
+            this.graphTitleBar = graphDomNode;
+            this.buildNumber = this.graphTitleBar.buildNumber;
+            this.buildUri = this.graphTitleBar.buildUri;
             this.baseUri = this.getBaseUri(this.buildUri);
             this.buildStatus = new Map();
         }
@@ -214,8 +230,8 @@ window.addEventListener('load', function () {
             if (!this.buildData) {
                 return dagreGraph;
             }
-            this.graphContainer.updateBuildStatus(this.buildData.status);
-            this.graphContainer.updateDuration(this.buildData.duration);
+            this.graphTitleBar.updateBuildStatus(this.buildData.status);
+            this.graphTitleBar.updateTotalBuildDuration(this.buildData.duration);
             var nodes = this.buildData.graphNodes;
             for (var i = 0; i < nodes.length; i++) {
                 var node = nodes[i];
@@ -227,9 +243,7 @@ window.addEventListener('load', function () {
                 var buildStatus = node['buildStatus'];
                 var duration = node['buildDuration'];
                 var buildNumberStr = buildNumber == -1 ? "" : "" + buildNumber;
-                var buttonCode = this.SHOW_BUTTON ? "<span style=\"padding-right: 10px\"></span>\n                                            <button data-project=\"" + projectName + "\" class=\"iconButton\">" + createIcon(buildStatus) + "</button>"
-                    : "";
-                var htmlNode = "<div class=\"node-row\">\n                                <div class=\"projectNameContainer\"><a target=\"_blank\" class=\"hoverLink projectName\" title=" + projectName + " href=\"" + projectUri + "\">" + displayName + "</a></div>\n                                <span class=\"projectBuildSpacing\"></span>\n                                <a target=\"_blank\" class=\"link buildLink hoverLink\" href=\"" + buildUri + "\">#" + buildNumberStr + "</a>\n                                " + buttonCode + "\n                            </div>\n                            <div class=\"node-row\">\n                                <p class=\"duration\">" + duration + "</p>\n                            </div>\n                            ";
+                var htmlNode = "<div class=\"node-row\">\n                                <div class=\"projectNameContainer\"><a target=\"_blank\" class=\"hoverLink projectName\" title=" + projectName + " href=\"" + projectUri + "\">" + displayName + "</a></div>\n                                <span class=\"projectBuildSpacing\"></span>\n                                <a target=\"_blank\" class=\"link buildLink hoverLink\" href=\"" + buildUri + "\">#" + buildNumberStr + "</a>\n                            </div>\n                            <div class=\"node-row\">\n                                <p class=\"duration\">" + duration + "</p>\n                                <span class=\"projectBuildSpacing\"></span>\n                                <button data-project=\"" + projectName + "\" data-status=\"" + buildStatus + "\"\n                                    class=\"iconButton\">" + createIcon(buildStatus) + "\n                                </button>\n                            </div>\n                            ";
                 dagreGraph.setNode(projectName, { labelType: "html", class: buildStatus, label: htmlNode, rx: 4, ry: 4 });
             }
             for (var i = 0; i < nodes.length; i++) {
@@ -241,24 +255,9 @@ window.addEventListener('load', function () {
                     dagreGraph.setEdge(projectName, child, { curve: d3.curveBasis });
                 }
             }
-            var svg = d3.select(this.graphContainer.svg);
+            var svg = d3.select(this.graphTitleBar.svg);
             svg.selectAll("*").remove();
             var svgGroup = svg.append("g");
-            var zoomFilter = function (event) {
-                if (event.button) {
-                    return false;
-                }
-                if (event.type === 'dblclick') {
-                    return false;
-                }
-                if (event.type === 'wheel' && event.shiftKey) {
-                    return true;
-                }
-                if (!event.button && event.type !== 'wheel') {
-                    return true;
-                }
-                return false;
-            };
             var zoom = d3.zoom().filter(function () {
                 return zoomFilter(event);
             }).on("zoom", function () {
@@ -270,33 +269,50 @@ window.addEventListener('load', function () {
             var LEFT_BORDER_WIDTH = 2;
             svg.call(zoom.transform, d3.zoomIdentity.translate(LEFT_BORDER_WIDTH, 20));
             svg.attr("height", dagreGraph.graph().height + 60);
-            if (this.SHOW_BUTTON) {
-                svg.selectAll("g.node .iconButton").on("click", function () {
-                    var button = d3.select(this);
-                    button.style("background-color", "red");
-                    var element = button.node();
-                    if (!element) {
-                        console.warn("Clicked button in the graph was not found via d3 selector");
-                        return;
-                    }
-                    var project = element.dataset.project;
-                    if (!project) {
-                        console.error("Clicked button does not have a project dataset set");
-                        return;
-                    }
-                    for (var _i = 0, nodes_1 = nodes; _i < nodes_1.length; _i++) {
-                        var node = nodes_1[_i];
-                        if (node.projectName == project) {
-                            console.error("TODO: Schedule a new build starting from project: " + project);
-                            return;
-                        }
-                    }
-                });
-            }
             this.graph = dagreGraph;
+            var outerRef = this;
+            svg.selectAll("g.node .iconButton").on("click", function () {
+                var buttonElement = d3.select(this);
+                var button = buttonElement.node();
+                if (!button) {
+                    console.warn("Clicked button in the graph was not found via d3 selector");
+                    return;
+                }
+                var status = button.dataset.status;
+                if (!status) {
+                    console.error("Clicked action button does not have a status dataset set");
+                    return;
+                }
+                var buildStatus = status;
+                outerRef.executeIconButtonAction(button, buildStatus);
+            });
             return dagreGraph;
         };
-        Graph.prototype.downloadAndRenderBuildData = function () {
+        Graph.prototype.executeIconButtonAction = function (button, buildStatus) {
+            var project = button.dataset.project;
+            if (!project) {
+                console.error("Clicked button does not have a project dataset set");
+                return;
+            }
+            button.classList.add("hidden");
+            setTimeout(function () {
+                button.classList.remove("hidden");
+            }, 10000);
+            switch (buildStatus) {
+                case "IN_PROGRESS":
+                    var abortUri = this.buildUri + "stop";
+                    new Ajax.Request(abortUri);
+                    break;
+                default:
+                    var params = new URLSearchParams({
+                        job: project,
+                        delay: "0sec"
+                    });
+                    var url = this.buildUri + "startPartialBuild?" + params.toString();
+                    new Ajax.Request(url);
+            }
+        };
+        Graph.prototype.downloadAndRenderGraph = function () {
             var _this = this;
             return downloadBuildData(this.buildUri)
                 .then(function (data) {
@@ -310,8 +326,8 @@ window.addEventListener('load', function () {
                 _this.buildData = data;
                 _this.buildStatus.clear();
                 var nodes = _this.buildData.graphNodes;
-                for (var _i = 0, nodes_2 = nodes; _i < nodes_2.length; _i++) {
-                    var node = nodes_2[_i];
+                for (var _i = 0, nodes_1 = nodes; _i < nodes_1.length; _i++) {
+                    var node = nodes_1[_i];
                     var name_1 = node.projectName;
                     var status_1 = node.buildStatus;
                     _this.buildStatus.set(name_1, status_1);
@@ -326,7 +342,7 @@ window.addEventListener('load', function () {
                 else {
                     msg = "Error while fetching build data for " + _this.buildUri + "#" + _this.buildNumber;
                 }
-                _this.graphContainer.svg.innerHTML = "<text x='20' y='20'>" + msg + "</text>";
+                _this.graphTitleBar.svg.innerHTML = "<text x='20' y='20'>" + msg + "</text>";
             });
         };
         Graph.prototype.updateBuildStatus = function (projectBuildStatus) {
@@ -340,21 +356,21 @@ window.addEventListener('load', function () {
             if (isFinished == undefined) {
                 throw new Error("'finished' flag was not received from the api, the API on the backend has probably changed");
             }
-            this.graphContainer.updateBuildStatus(projectBuildStatus.buildStatus);
-            this.graphContainer.updateDuration(projectBuildStatus.duration);
+            this.graphTitleBar.updateBuildStatus(projectBuildStatus.buildStatus);
+            this.graphTitleBar.updateTotalBuildDuration(projectBuildStatus.duration);
             var graphIsMissing = ((_a = this.graph) === null || _a === void 0 ? void 0 : _a.nodes().length) == 0;
             if (graphIsMissing) {
-                this.downloadAndRenderBuildData()
+                this.downloadAndRenderGraph()
                     .then(function (voidData) {
-                    _this.updateGraphNodes(jobsBuildStatus);
+                    _this.updateGraphWithNewData(jobsBuildStatus);
                 });
             }
             else {
-                this.updateGraphNodes(jobsBuildStatus);
+                this.updateGraphWithNewData(jobsBuildStatus);
             }
             return isFinished;
         };
-        Graph.prototype.updateGraphNodes = function (graphBuildStatus) {
+        Graph.prototype.updateGraphWithNewData = function (graphBuildStatus) {
             var _a;
             for (var _i = 0, graphBuildStatus_1 = graphBuildStatus; _i < graphBuildStatus_1.length; _i++) {
                 var jobBuildStatus = graphBuildStatus_1[_i];
@@ -394,6 +410,24 @@ window.addEventListener('load', function () {
                             }
                             else {
                                 console.warn("Found element is not an anchor element");
+                            }
+                        }
+                    }
+                    var triggerButtons = d3Node.getElementsByClassName("iconButton");
+                    if (!triggerButtons) {
+                        console.warn("Trigger button was not found for " + jobBuildStatus.projectName + "#" + jobBuildStatus.buildNumber);
+                    }
+                    else {
+                        for (var i = 0; i < triggerButtons.length; i++) {
+                            var buttonElement = triggerButtons.item(i);
+                            if (buttonElement instanceof HTMLButtonElement) {
+                                if (buttonElement.dataset.status != jobBuildStatus.buildStatus) {
+                                    buttonElement.innerHTML = createIcon(jobBuildStatus.buildStatus);
+                                    buttonElement.dataset.status = jobBuildStatus.buildStatus;
+                                }
+                            }
+                            else {
+                                console.warn("Trigger button was not an element of HTMLButtonElement " + jobBuildStatus.projectName + "#" + jobBuildStatus.buildNumber);
                             }
                         }
                     }
@@ -510,7 +544,7 @@ window.addEventListener('load', function () {
             console.error("SVG container could not be found, this is a bug");
             return;
         }
-        var graphDomNode = new GraphDomNode(projectName, build.number, build.url);
+        var graphDomNode = new GraphTitleBar(projectName, build.number, build.url);
         if (typeOfAdd == POSITION_SVG.APPEND) {
             svgContainer.appendChild(graphDomNode.container);
         }
@@ -521,7 +555,7 @@ window.addEventListener('load', function () {
             }
         }
         var graph = new Graph(graphDomNode);
-        graph.downloadAndRenderBuildData()
+        graph.downloadAndRenderGraph()
             .then(function (voidData) {
             var isFinished = graph.buildData ? graph.buildData.finished : false;
             if (!isFinished) {

@@ -108,13 +108,13 @@ window.addEventListener('load', function () {
     function handleInputScriptChange(newValue, pipelineSection, scmSection) {
         switch (newValue) {
             case "SCRIPT":
-                pipelineSection.classList.remove("hidden");
-                scmSection.classList.add("hidden");
+                pipelineSection.classList.remove("displayNone");
+                scmSection.classList.add("displayNone");
                 displayGraph();
                 break;
             case "SCM":
-                pipelineSection.classList.add("hidden");
-                scmSection.classList.remove("hidden");
+                pipelineSection.classList.add("displayNone");
+                scmSection.classList.remove("displayNone");
                 break;
             default:
                 console.error("Invalid input script option: " + newValue);

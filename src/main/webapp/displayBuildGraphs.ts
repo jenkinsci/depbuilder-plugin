@@ -11,6 +11,38 @@ declare let d3: any;
 declare let dagreD3: any;
 declare let Ajax: any;
 
+/**
+ * Custom zoom filter for the graph, that disables double click for
+ * zooming in the graph. The code is based on the official documentation:
+ * https://github.com/d3/d3-zoom#zoom_filter
+ */
+let zoomFilter = (event: any) => {
+    if (event.button) {
+        // disabling any movement when right click is pressed
+        // (context menu should be opened instead)
+        return false;
+    }
+
+    if (event.type === 'dblclick') {
+        // disabling double click for zoom in the graph
+        return false;
+    }
+
+    if (event.type === 'wheel' && event.shiftKey) {
+        // only allow zooming with scroll wheel when the shiftKey is held down.
+        // This ensures when the user is scrolling down with a mouse we don't
+        // hijack the down movement and start zooming in the graph
+        return true;
+    }
+
+    if (!event.button && event.type !== 'wheel') {
+        // allows panning
+        return true;
+    }
+
+    // in any other case we don't allow moving the elements on the screen
+    return false;
+}
 
 /**
  * Modal for displaying the modal for pipeline
@@ -88,11 +120,13 @@ const pipelineModal = new PipelineModal();
 pipelineModal.addToElement(document.body);
 
 
-enum StatusOfBuild {
-    IN_PROGRESS = "IN_PROGRESS",
-    ABORT = "ABORT",
+enum BuildStatus {
     ERROR = "ERROR",
-    SUCCESS = "SUCCESS"
+    ABORT = "ABORT",
+    SUCCESS = "SUCCESS",
+    IN_PROGRESS = "IN_PROGRESS",
+    NO_BUILD = "NO_BUILD",
+    NONE = "NONE",
 };
 
 // Part of jenkins api about builds (/jenkins/job/<name>/api/json)
@@ -109,7 +143,7 @@ interface DslBuild {
 
     graphNodes: FinishedBuildJob[]
     duration: string
-    status: string
+    status: BuildStatus
     finished: boolean
     error?: string
 }
@@ -126,7 +160,7 @@ interface FinishedBuildJob {
     // blank uri, -1, IN_PROGRESS status
     buildUri: string
     buildNumber: number
-    buildStatus: string
+    buildStatus: BuildStatus
     buildDuration : string
 }
 
@@ -138,7 +172,7 @@ interface ProjectBuildStatus {
     /**
      * Build status of the whole project (IN_PROGRESS, SUCCESS, ERROR, ABORT)
      */
-    buildStatus: string
+    buildStatus: BuildStatus
     /**
      * Duration for the whole project
      */
@@ -154,7 +188,7 @@ interface ProjectBuildStatus {
  */
 interface JobBuildInfo {
     projectName: string
-    buildStatus: string
+    buildStatus: BuildStatus
     buildNumber: number
     duration : string
     /**
@@ -163,7 +197,7 @@ interface JobBuildInfo {
     buildUri: string
 }
 
-function createIcon(buildStatus: string) : string {
+function createIcon(buildStatus: BuildStatus) : string {
     switch(buildStatus) {
         case "ERROR":
         case "ABORT":
@@ -195,10 +229,12 @@ const LATEST_BUILD_CHECK_MS = 10_000;
  */
 const MAX_BUILDS_FETCHED = 20;
 
+
 /**
- * The container for the entire graph (and not a container for one build node)
+ * The container that handles everything related to title bar
+ * (button actions, updating status light and duration)
  */
-class GraphDomNode {
+class GraphTitleBar {
     projectName: string;
     buildNumber : number;
     buildUri: string;
@@ -262,7 +298,7 @@ class GraphDomNode {
         this.cancelBuildButton.onclick = () => this.abortBuildEvent();
 
         // update all container fields
-        this.updateBuildStatus("NONE"); // update progress light to initial state
+        this.updateBuildStatus(BuildStatus.NONE); // update progress light to initial state
 
         // create a graph svg node
         const namespaceUri = "http://www.w3.org/2000/svg";
@@ -311,21 +347,20 @@ class GraphDomNode {
         pipelineModal.showModal();
     }
 
-    // TODO: replace with enum
-    updateBuildStatus(buildStatus: string) : void {
+    updateBuildStatus(buildStatus: BuildStatus) : void {
         this.currentState = buildStatus;
         this.progressLight.setAttribute("class", `graphLight ${buildStatus}`);
 
         switch(buildStatus) {
             case "IN_PROGRESS":
-                this.cancelBuildButton.classList.remove("hidden")
+                this.cancelBuildButton.classList.remove("displayNone")
                 break;
             default:
-                this.cancelBuildButton.classList.add("hidden");
+                this.cancelBuildButton.classList.add("displayNone");
         }
     }
 
-    updateDuration(duration : string) {
+    updateTotalBuildDuration(duration : string) {
         this.duration.innerText = `(${duration})`;
     }
 
@@ -346,7 +381,7 @@ class GraphDomNode {
                     // next update event tick, abort button could be displayed
                     // for a few more seconds, which looks very confusing (as if nothing
                     // has happened). Manual hiding the button works better in that case.
-                    this.cancelBuildButton.classList.add("hidden");
+                    this.cancelBuildButton.classList.add("displayNone");
                 } catch(error) {
                     console.error(error);
                 }
@@ -355,11 +390,12 @@ class GraphDomNode {
     }
 };
 
+
 /**
- * Class used for displaying data in the graph one number of the project build
+ * Used for displaying graph for one build (one specific build version)
  */
 class Graph {
-    graphContainer : GraphDomNode;
+    graphTitleBar : GraphTitleBar;
     // TODO: is there a way to avoid null graph problem?
     graph? : any;
     buildData?: DslBuild;
@@ -371,12 +407,11 @@ class Graph {
     buildUri : string;
     baseUri : string;
 
-    SHOW_BUTTON = false; // determines if we display run buttons in the graph nodes
     // we need some more (url from the project)
-    constructor(graphDomNode: GraphDomNode) {
-        this.graphContainer = graphDomNode;
-        this.buildNumber = this.graphContainer.buildNumber;
-        this.buildUri = this.graphContainer.buildUri; // <domain/jenkins/job/<name>/<buildNumber>
+    constructor(graphDomNode: GraphTitleBar) {
+        this.graphTitleBar = graphDomNode;
+        this.buildNumber = this.graphTitleBar.buildNumber;
+        this.buildUri = this.graphTitleBar.buildUri; // <domain/jenkins/job/<name>/<buildNumber>
         this.baseUri = this.getBaseUri(this.buildUri); // domain/jenkins
         this.buildStatus = new Map<string, string>();
     }
@@ -408,8 +443,8 @@ class Graph {
             return dagreGraph;
         }
 
-        this.graphContainer.updateBuildStatus(this.buildData.status);
-        this.graphContainer.updateDuration(this.buildData.duration);
+        this.graphTitleBar.updateBuildStatus(this.buildData.status);
+        this.graphTitleBar.updateTotalBuildDuration(this.buildData.duration);
         let nodes = this.buildData.graphNodes;
         for (let i = 0; i < nodes.length; i++) {
             let node = nodes[i];
@@ -431,9 +466,6 @@ class Graph {
              history rotation mechanism)
             */
             let buildNumberStr : string = buildNumber == -1 ? "" : "" + buildNumber;
-            let buttonCode = this.SHOW_BUTTON ? `<span style="padding-right: 10px"></span>
-                                            <button data-project="${projectName}" class="iconButton">${createIcon(buildStatus)}</button>`
-                                         : "";
 
             // We are adding tooltip to the node, since the name could be fairly long and will be cut.
             // With tooltip at least the user can hover over the name and see the full project name.
@@ -441,10 +473,13 @@ class Graph {
                                 <div class="projectNameContainer"><a target="_blank" class="hoverLink projectName" title=${projectName} href="${projectUri}">${displayName}</a></div>
                                 <span class="projectBuildSpacing"></span>
                                 <a target="_blank" class="link buildLink hoverLink" href="${buildUri}">#${buildNumberStr}</a>
-                                ${buttonCode}
                             </div>
                             <div class="node-row">
                                 <p class="duration">${duration}</p>
+                                <span class="projectBuildSpacing"></span>
+                                <button data-project="${projectName}" data-status="${buildStatus}"
+                                    class="iconButton">${createIcon(buildStatus)}
+                                </button>
                             </div>
                             `
             // class defines the css style class used for coloring the build node
@@ -464,39 +499,9 @@ class Graph {
         }
 
         // render
-        const svg = d3.select(this.graphContainer.svg);
+        const svg = d3.select(this.graphTitleBar.svg);
         svg.selectAll("*").remove(); // clear the graph of previous nodes
         let svgGroup = svg.append("g");
-
-        let zoomFilter = (event: any) => {
-            // see official documentation for more info: https://github.com/d3/d3-zoom#zoom_filter
-            if (event.button) {
-                // disabling any movement when right click is pressed
-                // (context menu should be opened instead)
-                return false;
-            }
-
-            if (event.type === 'dblclick') {
-                // disabling double click for zoom in the graph
-                return false;
-            }
-
-            if (event.type === 'wheel' && event.shiftKey) {
-                // only allow zooming with scroll wheel when the shiftKey is held down.
-                // This ensures when the user is scrolling down with a mouse we don't
-                // hijack the down movement and start zooming in the graph
-                return true;
-            }
-
-            if (!event.button && event.type !== 'wheel') {
-                // allows panning
-                return true;
-            }
-
-            // in any other case we don't allow moving the elements on the screen
-            return false;
-        }
-
         let zoom = d3.zoom().filter(() => {
             // ts ignore is forcing typescript to not check the following line.
             // The d3 is passing event through 'this' magic.
@@ -515,42 +520,75 @@ class Graph {
         const LEFT_BORDER_WIDTH = 2;
         svg.call(zoom.transform, d3.zoomIdentity.translate(LEFT_BORDER_WIDTH, 20));
         svg.attr("height", dagreGraph.graph().height + 60);
-
+        this.graph = dagreGraph;
 
         // add play node button handlers
-        if (this.SHOW_BUTTON) {
-            svg.selectAll("g.node .iconButton").on("click", function(this:any) {
-                // the only way to get the clicked button node is via d3 selector
-                let button : any = d3.select(this);
-                button.style("background-color", "red");
-                let element : HTMLButtonElement | undefined = button.node();
-                if (!element) {
-                    // this should never happen
-                    console.warn("Clicked button in the graph was not found via d3 selector");
-                    return;
-                }
+        const outerRef = this;
+        svg.selectAll("g.node .iconButton").on("click", function(this:any) {
+            // the only way to get the clicked button node is via d3 selector
+            let buttonElement : any = d3.select(this);
+            let button : HTMLButtonElement | undefined = buttonElement.node();
+            if (!button) {
+                // this should never happen
+                console.warn("Clicked button in the graph was not found via d3 selector");
+                return;
+            }
+            const status : string | undefined = button.dataset.status;
+            if (!status) {
+                // this should never happen
+                console.error("Clicked action button does not have a status dataset set");
+                return;
+            }
 
-                let project : string | undefined = element.dataset.project;
-                if (!project) {
-                    // this should never happen
-                    console.error("Clicked button does not have a project dataset set");
-                    return;
-                }
-
-                for (let node of nodes) {
-                    if (node.projectName == project) {
-                        // TODO: schedule a new build starting from this node...
-                        console.error("TODO: Schedule a new build starting from project: " + project)
-                        return;
-                    }
-                }
-            });
-        }
-        this.graph = dagreGraph;
+            let buildStatus = status as BuildStatus;
+            outerRef.executeIconButtonAction(button, buildStatus);
+        });
         return dagreGraph;
     }
 
-    downloadAndRenderBuildData(): Promise<void> {
+    executeIconButtonAction(button : HTMLButtonElement, buildStatus : BuildStatus) {
+        // @FUTURE: passing data through dataset is a bit convoluted.
+        // there should be a simpler approach for this problem.
+        let project : string | undefined = button.dataset.project;
+        if (!project) {
+            // this should never happen
+            console.error("Clicked button does not have a project dataset set");
+            return;
+        }
+
+        // after the action button is clicked, we immediately
+        // hide it in order to:
+        // - show the user their action was processed
+        // - prevent double clicks
+        button.classList.add("hidden");
+        setTimeout(() => {
+            button.classList.remove("hidden");
+            // 10 seconds timeout is enough for the new pipeline to appear
+            // in the dom node. Only after that we show the icon button again
+        }, 10_000);
+
+        switch(buildStatus){
+            case "IN_PROGRESS":
+                // @NOTE: decide, if we have two different branches in
+                // the pipeline that are being executed at the same time
+                // (possible in case of the automatic partial builds)
+                // maybe we would like to stop the build for only one
+                // branch?
+                let abortUri = this.buildUri + "stop";
+                new Ajax.Request(abortUri);
+                break;
+            default:
+                // trigger the partial build starting with the clicked job
+                const params = new URLSearchParams({
+                    job: project,
+                    delay: "0sec"
+                })
+                const url = this.buildUri + "startPartialBuild?" + params.toString();
+                new Ajax.Request(url);
+        }
+    }
+
+    downloadAndRenderGraph(): Promise<void> {
         return downloadBuildData(this.buildUri)
         .then(data => {
             if (data.ok) {
@@ -582,10 +620,9 @@ class Graph {
                 // we don't know what kind of error the server returned
                 msg = `Error while fetching build data for ${this.buildUri}#${this.buildNumber}`;
             }
-            this.graphContainer.svg.innerHTML = `<text x='20' y='20'>${msg}</text>`
+            this.graphTitleBar.svg.innerHTML = `<text x='20' y='20'>${msg}</text>`
         });
     }
-
 
     updateBuildStatus(projectBuildStatus: ProjectBuildStatus) : boolean {
         let jobsBuildStatus  = projectBuildStatus.jobBuildStatus;
@@ -601,8 +638,8 @@ class Graph {
         }
 
         // update light in the graph dom based on the current status
-        this.graphContainer.updateBuildStatus(projectBuildStatus.buildStatus);
-        this.graphContainer.updateDuration(projectBuildStatus.duration);
+        this.graphTitleBar.updateBuildStatus(projectBuildStatus.buildStatus);
+        this.graphTitleBar.updateTotalBuildDuration(projectBuildStatus.duration);
 
         const graphIsMissing = this.graph?.nodes().length == 0;
         if (graphIsMissing)  {
@@ -610,20 +647,20 @@ class Graph {
             // script via SCM. On the first createGraph method call, the pipeline
             // may not be downloaded yet and the graph structure is empty.
             // We have to populate the graph node by calling createGraph() method again.
-            this.downloadAndRenderBuildData()
+            this.downloadAndRenderGraph()
             .then(voidData => {
-                this.updateGraphNodes(jobsBuildStatus);
+                this.updateGraphWithNewData(jobsBuildStatus);
             });
         } else {
             // normal workflow
             // graph is already present, just update the graph nodes
-            this.updateGraphNodes(jobsBuildStatus);
+            this.updateGraphWithNewData(jobsBuildStatus);
         }
 
         return isFinished;
     }
 
-    private updateGraphNodes(graphBuildStatus : JobBuildInfo[]) {
+    private updateGraphWithNewData(graphBuildStatus : JobBuildInfo[]) {
         for (let jobBuildStatus of graphBuildStatus) {
             let internalBuildStatus = this.buildStatus.get(jobBuildStatus.projectName);
             if (!internalBuildStatus) {
@@ -692,6 +729,26 @@ class Graph {
                         } else {
                             // this should never happen unless we changed the build node html
                             console.warn("Found element is not an anchor element");
+                        }
+                    }
+                }
+
+                let triggerButtons : HTMLCollectionOf<Element> = d3Node.getElementsByClassName("iconButton")
+                if (!triggerButtons) {
+                    console.warn(`Trigger button was not found for ${jobBuildStatus.projectName}#${jobBuildStatus.buildNumber}`);
+                } else {
+                    // there should be only one button anyway
+                    for (let i = 0; i < triggerButtons.length; i++) {
+                        let buttonElement = triggerButtons.item(i);
+                        if (buttonElement instanceof HTMLButtonElement) {
+                            // only create a new icon and update status if the
+                            // build status has changed.
+                            if (buttonElement.dataset.status != jobBuildStatus.buildStatus) {
+                                buttonElement.innerHTML = createIcon(jobBuildStatus.buildStatus);
+                                buttonElement.dataset.status = jobBuildStatus.buildStatus;
+                            }
+                        } else {
+                            console.warn(`Trigger button was not an element of HTMLButtonElement ${jobBuildStatus.projectName}#${jobBuildStatus.buildNumber}`);
                         }
                     }
                 }
@@ -844,7 +901,7 @@ function downloadAndRenderBuild(projectName: string, build : JenkinsApiBuild, ty
         return;
     }
 
-    let graphDomNode = new GraphDomNode(projectName, build.number, build.url);
+    let graphDomNode = new GraphTitleBar(projectName, build.number, build.url);
 
     // on the first page render we are rendering builds from highest number to lowest
     // and for this reason we have to append them to the container (highest build
@@ -869,7 +926,7 @@ function downloadAndRenderBuild(projectName: string, build : JenkinsApiBuild, ty
     }
 
     let graph = new Graph(graphDomNode);
-    graph.downloadAndRenderBuildData()
+    graph.downloadAndRenderGraph()
     .then(voidData => {
         let isFinished = graph.buildData? graph.buildData.finished : false;
         if (!isFinished) {

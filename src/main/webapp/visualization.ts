@@ -160,8 +160,8 @@ function displayGraph() {
 function handleInputScriptChange(newValue: string, pipelineSection: HTMLElement, scmSection: HTMLElement) {
     switch (newValue) {
         case "SCRIPT":
-            pipelineSection.classList.remove("hidden");
-            scmSection.classList.add("hidden");
+            pipelineSection.classList.remove("displayNone");
+            scmSection.classList.add("displayNone");
 
             // WORKAROUND: when we render SCM first and then we switch to SCRIPT
             // the graph is not rendered completely (job names are not visible)
@@ -169,8 +169,8 @@ function handleInputScriptChange(newValue: string, pipelineSection: HTMLElement,
             displayGraph();
         break;
         case "SCM":
-            pipelineSection.classList.add("hidden");
-            scmSection.classList.remove("hidden");
+            pipelineSection.classList.add("displayNone");
+            scmSection.classList.remove("displayNone");
         break;
         default:
             console.error("Invalid input script option: " + newValue);
