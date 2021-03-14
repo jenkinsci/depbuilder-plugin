@@ -207,8 +207,8 @@ public class TestScheduler {
            while the rest of the nodes should have status NOT_BUILD
            A      E
            |      |
-          (B)      F
-            \   /
+          (B)     F
+            \    /
               C
               |
               D
@@ -243,19 +243,73 @@ public class TestScheduler {
         assertEquals("C", nodeC.getBuildJob().getId());
 
         // next node should be wait, until we finish building C
-        waitNode = scheduler.getNextNode();
+        waitNode = scheduler.getNext();
         assertEquals(ScheduledNodeStatus.WAIT, waitNode.getStatus());
         scheduler.successBuild(nodeC);
 
-        ScheduledNode nodeD = scheduler.getNextNode();
+        ScheduledNode nodeD = scheduler.getNext();
         assertEquals("D", nodeD.getBuildJob().getId());
 
         // next node should be wait, until we finish building D
-        waitNode = scheduler.getNextNode();
+        waitNode = scheduler.getNext();
         assertEquals(ScheduledNodeStatus.WAIT, waitNode.getStatus());
         scheduler.successBuild(nodeD);
 
-        ScheduledNode finished = scheduler.getNextNode();
+        ScheduledNode finished = scheduler.getNext();
+        assertEquals(ScheduledNodeStatus.FINISHED, finished.getStatus());
+    }
+
+    @Test
+    public void partialBuildTwoBranches() throws Exception {
+        /* Starting the build with nodes B and F
+           while the rest of the nodes should have status NOT_BUILD
+           A    E
+           |    |
+          (B)  (F)
+            \  / \
+             C    X
+             |
+             D
+         */
+        String input = "A -> B -> C -> D; E -> F -> C -> D; F -> X";
+        Scheduler scheduler = createScheduler(input, Arrays.asList("B", "F"));
+
+        ScheduledNode nodeB = scheduler.getNext();
+        assertEquals("B", nodeB.getBuildJob().getId());
+        scheduler.successBuild(nodeB);
+
+        ScheduledNode nodeF = scheduler.getNext();
+        assertEquals("F", nodeF.getBuildJob().getId());
+
+        // until F is built, C and X shouldn't be scheduled
+        ScheduledNode waitNode = scheduler.getNext();
+        assertEquals(ScheduledNodeStatus.WAIT, waitNode.getStatus());
+        scheduler.successBuild(nodeF);
+
+        ScheduledNode nodeC = scheduler.getNext();
+        assertEquals("C", nodeC.getBuildJob().getId());
+
+        ScheduledNode nodeX = scheduler.getNext();
+        assertEquals("X", nodeX.getBuildJob().getId());
+
+        // before building D, C should be finished. Finishing X build shouldn't
+        // allow D to be scheduled.
+        waitNode = scheduler.getNext();
+        assertEquals(ScheduledNodeStatus.WAIT, waitNode.getStatus());
+        scheduler.successBuild(nodeX);
+
+        // we have to wait until C is built
+        waitNode = scheduler.getNext();
+        assertEquals(ScheduledNodeStatus.WAIT, waitNode.getStatus());
+        scheduler.successBuild(nodeC);
+
+        ScheduledNode nodeD = scheduler.getNext();
+        assertEquals("D", nodeD.getBuildJob().getId());
+        waitNode = scheduler.getNext();
+        assertEquals(ScheduledNodeStatus.WAIT, waitNode.getStatus());
+
+        scheduler.successBuild(nodeD);
+        ScheduledNode finished = scheduler.getNext();
         assertEquals(ScheduledNodeStatus.FINISHED, finished.getStatus());
     }
 

@@ -327,11 +327,7 @@ public class Scheduler {
             return false;
         }
 
-        if (finished.size() == this.buildLayers.getNumberOfBuildNodes()) {
-            return false;
-        }
-
-        return true;
+        return finished.size() != this.buildLayers.getNumberOfBuildNodes();
     }
 
     /**
@@ -469,17 +465,15 @@ public class Scheduler {
         //
         // if onParentFailure.BUILD is selected, this block will be skipped and
         // the node will be scheduled for building even if there were errors upstream
+        //
+        // @FUTURE: we may want to add more fine grained abort mechanisms
+        // (e.g: abort only if the specific parent has failed)
         BuildSettings settings = childNode.getBuildSettings();
         if (settings.getOnParentFailure() == BuildSettings.ParentFailureMode.ABORT) {
             // check if any of the parents has build errors. In such case we should report
             // back as build errors, so we can't build the child node.
             for (BuildJob parentNode : parentNodesOfChild) {
                 if (parentNode.hasErrors() || parentNode.wasAborted()) {
-                    // TODO: compare with node settings in case of an error.
-                    //  If that particular parent has error, we might want to abort the build.
-                    //  We may provide an option:
-                    //  - build if immediate parent fails
-                    //  - build if any parent fails
                     return ParentBuildStatus.ERROR;
                 }
             }

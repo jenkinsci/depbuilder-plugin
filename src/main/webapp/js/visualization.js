@@ -17,7 +17,16 @@ window.addEventListener('load', function () {
             else {
                 htmlNode = "<a class=\"hoverLink\" target=\"_blank\" href=" + projectUri + ">" + displayName + "</a>";
             }
-            g.setNode(projectName, { labelType: "html", label: htmlNode, rx: 4, ry: 4 });
+            var paddingSide = 10;
+            var paddingTop = 5;
+            g.setNode(projectName, { labelType: "html", label: htmlNode,
+                rx: 4,
+                ry: 4,
+                paddingLeft: paddingSide,
+                paddingRight: paddingSide,
+                paddingTop: paddingTop,
+                paddingBottom: paddingTop
+            });
         }
         for (var i = 0; i < nodes.length; i++) {
             var node = nodes[i];

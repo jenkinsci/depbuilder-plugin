@@ -35,7 +35,16 @@ function createGraph(nodes: BuildNode[], cycle: string[], renderElement: string)
             htmlNode = `<a class="hoverLink" target="_blank" href=${projectUri}>${displayName}</a>`
         }
         // beside label we can add class: 'my-class' to style a certain node
-        g.setNode(projectName, {labelType:"html", label: htmlNode, rx: 4, ry: 4});
+        const paddingSide = 10;
+        const paddingTop = 5;
+        g.setNode(projectName, {labelType:"html", label: htmlNode,
+            rx: 4,
+            ry: 4,
+            paddingLeft: paddingSide,
+            paddingRight: paddingSide,
+            paddingTop: paddingTop,
+            paddingBottom: paddingTop
+        });
     }
 
     // create edges

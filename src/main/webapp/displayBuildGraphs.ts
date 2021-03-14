@@ -1,9 +1,9 @@
-const ICON_STOP=`<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path class="iconColor" d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48z"></path></svg>`
-const ICON_PLAY=`<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path class="iconColor" d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"></path></svg>`
+const ICON_STOP=`<svg class="icon STOP" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path class="iconColor" d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48z"></path></svg>`
+const ICON_PLAY=`<svg class="icon PLAY" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path class="iconColor" d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"></path></svg>`
 const ICON_RESTART=`<svg class="icon RESTART" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path class="iconColor" d="M256.455 8c66.269.119 126.437 26.233 170.859 68.685l35.715-35.715C478.149 25.851 504 36.559 504 57.941V192c0 13.255-10.745 24-24 24H345.941c-21.382 0-32.09-25.851-16.971-40.971l41.75-41.75c-30.864-28.899-70.801-44.907-113.23-45.273-92.398-.798-170.283 73.977-169.484 169.442C88.764 348.009 162.184 424 256 424c41.127 0 79.997-14.678 110.629-41.556 4.743-4.161 11.906-3.908 16.368.553l39.662 39.662c4.872 4.872 4.631 12.815-.482 17.433C378.202 479.813 319.926 504 256 504 119.034 504 8.001 392.967 8 256.002 7.999 119.193 119.646 7.755 256.455 8z"></path></svg>`
-const ICON_PIPELINE = `<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path class="iconColor" d="M504.971 359.029c9.373 9.373 9.373 24.569 0 33.941l-80 79.984c-15.01 15.01-40.971 4.49-40.971-16.971V416h-58.785a12.004 12.004 0 0 1-8.773-3.812l-70.556-75.596 53.333-57.143L352 336h32v-39.981c0-21.438 25.943-31.998 40.971-16.971l80 79.981zM12 176h84l52.781 56.551 53.333-57.143-70.556-75.596A11.999 11.999 0 0 0 122.785 96H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12zm372 0v39.984c0 21.46 25.961 31.98 40.971 16.971l80-79.984c9.373-9.373 9.373-24.569 0-33.941l-80-79.981C409.943 24.021 384 34.582 384 56.019V96h-58.785a12.004 12.004 0 0 0-8.773 3.812L96 336H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h110.785c3.326 0 6.503-1.381 8.773-3.812L352 176h32z"></path></svg>`
-const ICON_BAN = `<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path class="iconColor" d="M256 8C119.034 8 8 119.033 8 256s111.034 248 248 248 248-111.034 248-248S392.967 8 256 8zm130.108 117.892c65.448 65.448 70 165.481 20.677 235.637L150.47 105.216c70.204-49.356 170.226-44.735 235.638 20.676zM125.892 386.108c-65.448-65.448-70-165.481-20.677-235.637L361.53 406.784c-70.203 49.356-170.226 44.736-235.638-20.676z"></path></svg>`
-const ICON_CANCEL_X = `<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path class="iconColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>`;
+const ICON_PIPELINE = `<svg class="icon PIPELINE" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path class="iconColor" d="M504.971 359.029c9.373 9.373 9.373 24.569 0 33.941l-80 79.984c-15.01 15.01-40.971 4.49-40.971-16.971V416h-58.785a12.004 12.004 0 0 1-8.773-3.812l-70.556-75.596 53.333-57.143L352 336h32v-39.981c0-21.438 25.943-31.998 40.971-16.971l80 79.981zM12 176h84l52.781 56.551 53.333-57.143-70.556-75.596A11.999 11.999 0 0 0 122.785 96H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12zm372 0v39.984c0 21.46 25.961 31.98 40.971 16.971l80-79.984c9.373-9.373 9.373-24.569 0-33.941l-80-79.981C409.943 24.021 384 34.582 384 56.019V96h-58.785a12.004 12.004 0 0 0-8.773 3.812L96 336H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h110.785c3.326 0 6.503-1.381 8.773-3.812L352 176h32z"></path></svg>`
+const ICON_BAN = `<svg class="icon BAN" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path class="iconColor" d="M256 8C119.034 8 8 119.033 8 256s111.034 248 248 248 248-111.034 248-248S392.967 8 256 8zm130.108 117.892c65.448 65.448 70 165.481 20.677 235.637L150.47 105.216c70.204-49.356 170.226-44.735 235.638 20.676zM125.892 386.108c-65.448-65.448-70-165.481-20.677-235.637L361.53 406.784c-70.203 49.356-170.226 44.736-235.638-20.676z"></path></svg>`
+const ICON_CANCEL_X = `<svg class="icon CANCEL_X" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path class="iconColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>`;
 
 
 // declaring library functions to satisfy the ts compiler
@@ -199,9 +199,6 @@ interface JobBuildInfo {
 
 function createIcon(buildStatus: BuildStatus) : string {
     switch(buildStatus) {
-        case "ERROR":
-        case "ABORT":
-            return ICON_RESTART;
         case "IN_PROGRESS":
             return ICON_STOP;
         default:
@@ -476,14 +473,23 @@ class Graph {
                             </div>
                             <div class="node-row">
                                 <p class="duration">${duration}</p>
-                                <span class="projectBuildSpacing"></span>
                                 <button data-project="${projectName}" data-status="${buildStatus}"
                                     class="iconButton">${createIcon(buildStatus)}
                                 </button>
                             </div>
                             `
             // class defines the css style class used for coloring the build node
-            dagreGraph.setNode(projectName, {labelType:"html", class: buildStatus, label: htmlNode, rx: 4, ry: 4});
+            const paddingSide = 7;
+            const paddingTop = 5;
+            const radius = 4;
+            dagreGraph.setNode(projectName, {labelType:"html", class: buildStatus, label: htmlNode,
+                rx: radius,
+                ry: radius,
+                paddingLeft: paddingSide,
+                paddingRight: paddingSide,
+                paddingTop: paddingTop,
+                paddingBottom: paddingTop
+            });
         }
 
         // create edges
@@ -575,16 +581,30 @@ class Graph {
                 // maybe we would like to stop the build for only one
                 // branch?
                 let abortUri = this.buildUri + "stop";
-                new Ajax.Request(abortUri);
+                new Ajax.Request(abortUri, {
+                    contentType: "application/json",
+                    onFailure: function(response:Response) {
+                        // for some reason the returned response is in XML and
+                        // I don't know how to force content type to json
+                        alert(`Failed to stop the build.\nServer response: ${response.status}`);
+                    }
+                });
                 break;
             default:
-                // trigger the partial build starting with the clicked job
                 const params = new URLSearchParams({
                     job: project,
                     delay: "0sec"
                 })
                 const url = this.buildUri + "startPartialBuild?" + params.toString();
-                new Ajax.Request(url);
+                new Ajax.Request(url, {
+                    dataType: "json",
+                    contentType: "application/json",
+                    onFailure: function(response:Response) {
+                        // for some reason the returned response is in XML and
+                        // I don't know how to force content type to json
+                        alert(`Failed to trigger build of: ${project}.\nServer response: ${response.status}`);
+                    }
+                });
         }
     }
 

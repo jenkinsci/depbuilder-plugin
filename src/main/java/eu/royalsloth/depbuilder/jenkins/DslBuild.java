@@ -83,7 +83,7 @@ public class DslBuild extends Build<DslProject, DslBuild> {
         seconds = seconds - minutes * 60;
 
         if (hours > 0) {
-            return String.format("%dh:%02dm", hours, minutes);
+            return String.format("%d:%02d", hours, minutes);
         }
 
         // hours don't exist

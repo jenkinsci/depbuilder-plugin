@@ -56,7 +56,7 @@ This resets their default settings */
     background-color: #fff;
     animation: breathe 2s infinite;
     border-radius: 50% 50%;
-    border: 2px solid #9BA7AF;
+    border: 1px solid #666;
     margin-right: 10px;
     animation: none;
 }
@@ -112,7 +112,7 @@ button.displayNone {
 }
 
 .iconButton {
-    transition: visibility 0.3s ease-in, opacity 0.3s ease-in;
+    transition: visibility 0.2s ease-in, opacity 0.2s ease-in;
     opacity: 1;
 }
 
@@ -128,11 +128,11 @@ button.displayNone {
 /* Normal graph node style */
 .node rect {
   fill: #fff;
-  /** if shadow is needed, you can use:
+  /** if box-shadow is needed, you can use filter:
       filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.2));
   */
-   stroke: #9BA7AF;
-   stroke-width: 2px;
+   stroke: #666;
+   stroke-width: 1px;
 }
 
 /** Style graph edge - arrow head and handle */
@@ -216,7 +216,7 @@ node that was not built is not
 .node-row .projectName {
     white-space: nowrap;
     max-width: 15ch;
-    overflow: displayNone;
+    overflow: hidden;
     text-overflow: ellipsis;
 }
 
@@ -227,7 +227,7 @@ node that was not built is not
 }
 
 .node-row .duration {
-    /* 15h:20m */
+    /* 15:20 */
     min-width: 7ch;
 }
 
@@ -239,7 +239,7 @@ node that was not built is not
 }
 
 .iconButton {
-    padding: 0 2px 0 5px;
+    padding: 0 1px 0 5px;
     margin: 0;
     border: none;
     display: inline-block;
@@ -249,8 +249,15 @@ node that was not built is not
 
 /** button icons style */
 .icon {
-    width: 10px;
-    height: 10px;
+    max-width: 10px;
+    max-height: 10px;
+    /* Without overflow the play svg icon is cut off */
+    overflow: visible;
+}
+
+.icon.PLAY {
+    /* play icon is quite large, so we are shrinking it for one pixel*/
+    max-height: 9px;
 }
 
 /** restart icon is very small in comparison to start and stop icons*/
@@ -351,8 +358,7 @@ save|cancel buttons. Changing z-index from 10 to 9 fixes this problem.
     max-height: calc(100vh - 1rem);
 
     flex-direction: column;
-    overflow: displayNone;
-    -ms-overflow-y: visible;
+    overflow: hidden;
     background-color: #fff;
     padding: 20px 10px 15px 10px;
     border-radius: 3px;
@@ -391,5 +397,5 @@ save|cancel buttons. Changing z-index from 10 to 9 fixes this problem.
 /* makes the element unscrollable (apply it to html element when the
  modal is being opened) */
 .is-clipped {
-    overflow: displayNone !important;
+    overflow: hidden !important;
 }
