@@ -473,6 +473,7 @@ class Graph {
                             </div>
                             <div class="node-row">
                                 <p class="duration">${duration}</p>
+                                <span class="projectBuildSpacing"></span>
                                 <button data-project="${projectName}" data-status="${buildStatus}"
                                     class="iconButton">${createIcon(buildStatus)}
                                 </button>

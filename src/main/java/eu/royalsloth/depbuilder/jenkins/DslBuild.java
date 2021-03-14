@@ -195,7 +195,7 @@ public class DslBuild extends Build<DslProject, DslBuild> {
 
         // seconds to wait before starting the build
         int quietPeriod = 0;
-        CauseAction cause = ParameterizedJobMixIn.getBuildCause(this.getProject(), req);
+        CauseAction cause = new CauseAction(new Cause.UserIdCause());
         PartialBuildAction action = new PartialBuildAction(Arrays.asList(job));
         this.getProject().scheduleBuild2(quietPeriod, cause, action);
     }

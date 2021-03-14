@@ -5,6 +5,18 @@ Changelog
 
 |
 
+Changelog 1.1.0
+-------------------------
+*2021-03-14*
+
+- DSL: added a name field into the job settings block, which allows you to override
+  the default job name. If you are using a folder plugin the job names could be
+  extremely long and this allows you to make their names shorter and memorable.
+
+- UI: the user can now build just a small part of the build graph by clicking on the play
+  icon in the graph node.
+
+
 Changelog 1.0.6
 -------------------------
 *2021-02-10*

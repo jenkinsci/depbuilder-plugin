@@ -24,7 +24,7 @@ copyright = '2021, RoyalSloth'
 author = 'RoyalSloth'
 
 # The short X.Y version
-version = '1.0.0'
+version = '1.1.0'
 # The full version, including alpha/beta/rc tags
 # release = '1.0.0'
 html_title = 'DepBuilder Documentation'

@@ -250,6 +250,12 @@ in the pipeline.
      - Default
      - Description
 
+   * - name
+     -
+     - Allows you to override the default job name that is displayed in the build
+       graph. The Jenkins job names has to be unique and could therefore become quite long,
+       while the name fields do not have to be unique.
+
    * - agent
      - [any]
      - Defines the Jenkins build runner on which the build should be executed on.
@@ -316,6 +322,9 @@ in the pipeline.
 
    // override the default and _ALL build settings
    backendBuild {
+      // the backendBuild job will be displayed in the build graph as MyBackendBuild
+      name: "MyBackendBuild"
+
       // any build agent with free executors will be able to build this job
       agent: [any]
 
@@ -420,6 +429,7 @@ Examples
    backendBuild {
       // overrides settings from _ALL settings
       // overrides the default weight factor
+      name: "MyBackend"
       agent: [windows_runner]
       maxDuration: 00:20
       weight: 3;
@@ -441,7 +451,8 @@ Examples
       The following is true for our build:
       -------------------------------------
 
-      1. backendBuild will be built on windows_runner
+      1. backendBuild will be built on windows_runner and will be displayed
+         as MyBackend in the build graph.
 
       2. If either backendBuild or frontendBuild fails, the build will
          fail and the integrationTests will never run
