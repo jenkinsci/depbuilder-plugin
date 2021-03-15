@@ -136,6 +136,11 @@ interface JenkinsApiBuild {
     url: string
 }
 
+interface JenkinsPartialBuildResponse {
+    status: number,
+    responseJSON: {msg: string}
+}
+
 // part of our custom api (/jenkins/job/<name>/<buildNumber>/api/json)
 interface DslBuild {
     projectName: string
@@ -600,10 +605,10 @@ class Graph {
                 new Ajax.Request(url, {
                     dataType: "json",
                     contentType: "application/json",
-                    onFailure: function(response:Response) {
+                    onFailure: function(response:JenkinsPartialBuildResponse) {
                         // for some reason the returned response is in XML and
                         // I don't know how to force content type to json
-                        alert(`Failed to trigger build of: ${project}.\nServer response: ${response.status}`);
+                        alert(`Failed to trigger a new partial build: \n${response.responseJSON.msg}\n\n`);
                     }
                 });
         }

@@ -111,17 +111,6 @@ button.displayNone {
     display: none;
 }
 
-.iconButton {
-    transition: visibility 0.2s ease-in, opacity 0.2s ease-in;
-    opacity: 1;
-}
-
-.iconButton.hidden {
-    visibility: hidden;
-    user-select: none;
-    opacity: 0;
-}
-
 /**********************************
   Styling graph nodes
 ***********************************/
@@ -242,13 +231,39 @@ node that was not built is not
     padding: 0 1px 0 5px;
     margin: 0;
     border: none;
+    outline: none;
     display: inline-block;
     cursor: pointer;
     background-color: transparent;
+    transition: visibility 0.2s ease-in, opacity 0.2s ease-in;
+    opacity: 1;
+}
+
+.iconButton.hidden {
+    visibility: hidden;
+    user-select: none;
+    opacity: 0;
+}
+
+/*
+Remove ugly blue button border when the button is in focus. Instead
+we are making the icon darker (same style as when hovering the icon)
+This might not be the most obvious to the keyboard users, but the
+graph was not really intended for keyboard users (with a lot of nodes
+keyboard navigation becomes unwieldy)
+*/
+.iconButton:focus-visible {
+    outline: none;
+}
+
+.iconButton:focus-visible .iconColor {
+    fill: #222;
 }
 
 /** button icons style */
 .icon {
+    width: 10px;
+    height: 10px;
     max-width: 10px;
     max-height: 10px;
     /* Without overflow the play svg icon is cut off */

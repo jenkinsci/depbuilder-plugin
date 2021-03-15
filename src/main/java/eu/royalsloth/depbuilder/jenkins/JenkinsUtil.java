@@ -110,7 +110,7 @@ public class JenkinsUtil {
                 return job;
             }
         }
-        String msg = String.format("Job '%s' does not exist in jenkins", jobName);
+        String msg = String.format("Job '%s' does not exist in Jenkins.", jobName);
         throw new IllegalStateException(msg);
     }
 

@@ -325,7 +325,7 @@ window.addEventListener('load', function () {
                         dataType: "json",
                         contentType: "application/json",
                         onFailure: function (response) {
-                            alert("Failed to trigger build of: " + project + ".\nServer response: " + response.status);
+                            alert("Failed to trigger a new partial build: \n" + response.responseJSON.msg + "\n\n");
                         }
                     });
             }

@@ -72,6 +72,10 @@ public class DslBuild extends Build<DslProject, DslBuild> {
         // this avoids the problems of very short build time frames. For the end
         // user it looks weird to see 0s written in the gui for very short builds
         if (milliseconds < 1000) {
+            if (milliseconds == 0) {
+                return "0s";
+            }
+
             double inSeconds = milliseconds / 1000.0;
             return String.format("%.1fs", inSeconds);
         }
@@ -181,23 +185,37 @@ public class DslBuild extends Build<DslProject, DslBuild> {
      * Endpoint that allows the user to trigger a partial build of the pipeline.
      * This action is usually triggered by clicking on the play icon of the node in
      * pipeline frontend.
+     *
+     * @param job name of the job that should be built
      */
     @POST
-    public void doStartPartialBuild(StaplerRequest req, StaplerResponse rsp, @QueryParameter String job) {
+    public void doStartPartialBuild(StaplerRequest req, StaplerResponse rsp,
+            @QueryParameter String job) throws IOException {
         JenkinsUtil.getJenkins().checkPermission(Jenkins.ADMINISTER);
-        if (job == null) {
-            throw new IllegalStateException("You should provide a job query parameter");
+        if (job == null || job.isEmpty()) {
+            rsp.setStatus(400);
+            rsp.setContentType("application/json");
+            String msg = "You should provide a job query parameter";
+            rsp.getWriter().write(String.format("{\"msg\": \"%s\"}", msg));
+            return;
         }
 
-        // verify that the provided job exists on Jenkins
-        job = job.trim();
-        JenkinsUtil.getJob(getProject(), job);
+        try {
+            // verify that the provided job exists on Jenkins
+            job = job.trim();
+            JenkinsUtil.getJob(getProject(), job);
 
-        // seconds to wait before starting the build
-        int quietPeriod = 0;
-        CauseAction cause = new CauseAction(new Cause.UserIdCause());
-        PartialBuildAction action = new PartialBuildAction(Arrays.asList(job));
-        this.getProject().scheduleBuild2(quietPeriod, cause, action);
+            // seconds to wait before starting the build
+            int quietPeriod = 0;
+            CauseAction cause = new CauseAction(new Cause.UserIdCause());
+            PartialBuildAction action = new PartialBuildAction(Arrays.asList(job));
+            this.getProject().scheduleBuild2(quietPeriod, cause, action);
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Failed to schedule the partial build", e);
+            rsp.setStatus(400);
+            rsp.setContentType("application/json");
+            rsp.getWriter().write(String.format("{\"msg\": \"%s\"}", e.getMessage()));
+        }
     }
 
     /**
