@@ -11,7 +11,6 @@ import hudson.Util;
 import hudson.model.*;
 import hudson.model.labels.LabelAssignmentAction;
 import hudson.model.queue.SubTask;
-import jenkins.model.Jenkins;
 
 import java.util.ArrayList;
 import java.util.List;
