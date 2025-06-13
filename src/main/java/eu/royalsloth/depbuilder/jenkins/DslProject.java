@@ -21,7 +21,7 @@ import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.verb.POST;
 
 import javax.annotation.CheckForNull;
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.*;
@@ -144,8 +144,8 @@ public class DslProject extends Project<DslProject, DslBuild> implements TopLeve
     // For some reason I cannot get it to work via our custom doCheck method in the project descriptor.
     @POST
     @Override
-    public synchronized void doConfigSubmit(StaplerRequest req,
-            StaplerResponse rsp) throws IOException, ServletException, Descriptor.FormException {
+    public synchronized void doConfigSubmit(StaplerRequest2 req,
+            StaplerResponse2 rsp) throws IOException, ServletException, Descriptor.FormException {
         JenkinsUtil.getJenkins().checkPermission(Jenkins.ADMINISTER);
 
         JSONObject json = req.getSubmittedForm();

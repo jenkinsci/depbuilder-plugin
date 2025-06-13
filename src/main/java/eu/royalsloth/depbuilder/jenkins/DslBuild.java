@@ -18,8 +18,8 @@ import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.verb.POST;
 
@@ -189,7 +189,7 @@ public class DslBuild extends Build<DslProject, DslBuild> {
      * @param job name of the job that should be built
      */
     @POST
-    public void doStartPartialBuild(StaplerRequest req, StaplerResponse rsp,
+    public void doStartPartialBuild(StaplerRequest2 req, StaplerResponse2 rsp,
             @QueryParameter String job) throws IOException {
         JenkinsUtil.getJenkins().checkPermission(Jenkins.ADMINISTER);
         if (job == null || job.isEmpty()) {
